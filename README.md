@@ -5,8 +5,9 @@
 > [!TIP]
 > **Experience the Power of JavaFX on the Web:** This entire dashboard is written in Java and compiled to highly optimized JavaScript.
 
-[![WebFX](https://img.shields.io/badge/WebFX-transpiler-blue.svg?style=for-the-badge)](https://github.com/webfx-project)
+[![WebFX](https://img.shields.io/badge/WebFX-transpiler-blue.svg?style=for-the-badge)](https://webfx.dev)
 [![GWT](https://img.shields.io/badge/GWT-orange?style=for-the-badge)](https://www.gwtproject.org/)
+[![Teavm](https://img.shields.io/badge/TEAVM-compatible-blue?style=for-the-badge)](https://www.gwtproject.org/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-21+-blue?style=for-the-badge)](https://openjfx.io)
 [![GitHub License](https://img.shields.io/github/license/CommonGrounds/CyclingPower?style=for-the-badge)](https://github.com/CommonGrounds/CyclingPower)
 [![GitHub stars](https://img.shields.io/github/stars/CommonGrounds/CyclingPower?style=for-the-badge)](https://github.com/CommonGrounds/CyclingPower/stargazers)
