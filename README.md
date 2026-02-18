@@ -5,11 +5,11 @@
 > [!TIP]
 > **Experience the Power of JavaFX on the Web:** This entire dashboard is written in Java and compiled to highly optimized JavaScript.
 
-[![GluonFX](https://img.shields.io/badge/GluonFX-Native-blue.svg?style=for-the-badge)](https://github.com/gluonhq/gluonfx)
-[![Java](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge)](https://openjdk.org/)
+[![WebFX](https://img.shields.io/badge/WebFX-transpiler-blue.svg?style=for-the-badge)](https://github.com/webfx-project)
+[![GWT](https://img.shields.io/badge/GWT-orange?style=for-the-badge)](https://www.gwtproject.org/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-21+-blue?style=for-the-badge)](https://openjfx.io)
 [![GitHub License](https://img.shields.io/github/license/CommonGrounds/CyclingPower?style=for-the-badge)](https://github.com/CommonGrounds/CyclingPower)
-[![GitHub stars](https://img.shields.io/github/stars/CommonGrounds/CyclingPower?style=for-the-badge)](https://github.com/CommonGrounds/CyclingPower_Mobile/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/CommonGrounds/CyclingPower?style=for-the-badge)](https://github.com/CommonGrounds/CyclingPower/stargazers)
 [![GitHub last commit](https://img.shields.io/github/last-commit/CommonGrounds/CyclingPower?style=for-the-badge)](https://github.com/CommonGrounds/CyclingPower/commits/main)
 ![GitHub top language](https://img.shields.io/github/languages/top/CommonGrounds/CyclingPower?style=for-the-badge)
 
@@ -61,4 +61,4 @@ Check out the live dashboard here:
 This repository is part of a larger ecosystem:
 
 1. **[Cycle Power Mobile](https://github.com/CommonGrounds/CyclingPower_Mobile):** The GluonFX-based mobile app for recording rides.
-2. **[Cycle Power Backend](https://www.google.com/search?q=https://github.com/CommonGrounds/CyclingPower_Server):** The Spring Boot server that manages data and FIT file conversion.
+2. **[Cycle Power Backend](https://github.com/CommonGrounds/CyclingPower_Server):** The Spring Boot server that manages data and FIT file conversion.
