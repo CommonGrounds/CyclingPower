@@ -59,7 +59,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.java4now.web.CyclingPower_Web_Local.*;
 import static dev.java4now.web.Settings.name_txt;
 import static dev.java4now.web.graph.CanvasChartPane.graph_type;
-import static dev.java4now.web.model.futures_fetcher.BASE_URL;
 import static dev.java4now.web.view.LeftPane.*;
 
 public class UpPane {

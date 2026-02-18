@@ -68,6 +68,17 @@ import static dev.java4now.web.websocket.WebSocketClient.startWebSocket;
 
 public class CyclingPower_Web_Local extends Application {
 
+//##############################################################
+    public static boolean PRODUCTION = true;
+//##############################################################
+
+    public static String BASE_URL = "http://localhost:8080";                                        // local - 8080 sa clone serverom , 8880 sa orig
+    public static String websocket_url = "ws://localhost:8080/ws";                                  // local
+    public static String IMAGE_UPLOAD_URL = "http://localhost:8080/api/upload-image";
+//    public static final String IMAGE_UPLOAD_URL = "https://cyclingpower-server-1.onrender.com/api/upload-image";
+//    public static String BASE_URL = "https://cyclingpower-server-1.onrender.com";                 // http://localhost:8880
+//    public static String websocket_url = "wss://cyclingpower-server-1.onrender.com/ws";           // "ws://localhost:8880/ws";
+
     public static StackPane uber_root = new StackPane();
     public static VBox pictures_pane = new VBox();
     public static double screen_width, screen_height;
@@ -128,12 +139,18 @@ public class CyclingPower_Web_Local extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        Console.info("Logging info");
-        Console.log("Logging log");
-        Console.debug("Logging debug");
-        Console.warn("Logging warn");
-        Console.error("Logging error");
-        Console.logNative("Logging native");
+        if (PRODUCTION){
+            BASE_URL = "https://cyclingpower-server-1.onrender.com";
+            websocket_url = "wss://cyclingpower-server-1.onrender.com/ws";
+            IMAGE_UPLOAD_URL = "https://cyclingpower-server-1.onrender.com/api/upload-image";
+        }
+
+//        Console.info("Logging info");
+//        Console.log("Logging log");
+//        Console.debug("Logging debug");
+//        Console.warn("Logging warn");
+//        Console.error("Logging error");
+//        Console.logNative("Logging native");
 
 //        Console.log(CyclingPower_Web.class.getName() + "/data/cities1000.txt");
 //        Console.log("%s".formatted("Hello"));
@@ -392,7 +409,7 @@ public class CyclingPower_Web_Local extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        startWebSocket(futures_fetcher.websocket_url);
+        startWebSocket(websocket_url);
 
         Platform.runLater(new Runnable() {
             @Override

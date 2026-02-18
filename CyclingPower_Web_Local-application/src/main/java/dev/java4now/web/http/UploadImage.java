@@ -10,6 +10,8 @@ import dev.webfx.platform.fetch.FormData;
 import dev.webfx.platform.fetch.Headers;
 import dev.webfx.platform.file.File;
 
+import static dev.java4now.web.CyclingPower_Web_Local.IMAGE_UPLOAD_URL;
+
 public class UploadImage {
 
 
@@ -34,7 +36,7 @@ public class UploadImage {
 
         Console.log("Uploading resized blob: " + filename + " (size: " + imageBlob.length() + " bytes) for JSON: " + json_name + " (counter: " + image_counter + ")");
 
-        Fetch.fetch(futures_fetcher.IMAGE_UPLOAD_URL, options)
+        Fetch.fetch(IMAGE_UPLOAD_URL, options)
                 .onSuccess(response -> {
                     Console.log("Response status: " + response.status());
                     if (response.status() == 200) {
@@ -83,7 +85,7 @@ public class UploadImage {
 
         Console.log("Uploading image: " + imageFile.getName() + " (size: " + imageBlob.length() + " bytes, type: " + imageFile.getMimeType() + ") for JSON: " + json_name + " (counter: " + image_counter + ")");
 
-        Fetch.fetch(futures_fetcher.IMAGE_UPLOAD_URL, options)
+        Fetch.fetch(IMAGE_UPLOAD_URL, options)
                 .onSuccess(response -> {
                     Console.log("Response status: " + response.status());
                     if (response.status() == 200) {

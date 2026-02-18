@@ -23,8 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static dev.java4now.web.CyclingPower_Web_Local.bar_chart;
-import static dev.java4now.web.CyclingPower_Web_Local.cityService;
+import static dev.java4now.web.CyclingPower_Web_Local.*;
 import static dev.java4now.web.custom_ui.SimpleListView.progress;
 import static dev.java4now.web.view.UpPane.jsonFileListView;
 
@@ -40,12 +39,6 @@ public class futures_fetcher {
     public static int chosen_year = current_Year;
     public static MenuButtonGroup yearSelector; // Set from LeftPane
     public static MenuButtonGroup monthSelector;
-    public static String BASE_URL = "http://localhost:8080";                                        // local - 8080 sa clone serverom , 8880 sa orig
-    public static String websocket_url = "ws://localhost:8080/ws";                                  // local
-    public static final String IMAGE_UPLOAD_URL = "http://localhost:8080/api/upload-image";
-//    public static final String IMAGE_UPLOAD_URL = "https://cyclingpower-server-1.onrender.com/api/upload-image";
-//    public static String BASE_URL = "https://cyclingpower-server-1.onrender.com";                 // http://localhost:8880
-//    public static String websocket_url = "wss://cyclingpower-server-1.onrender.com/ws";           // "ws://localhost:8880/ws";
     // Progress counter
     private static boolean LOAD_ACTIVITY = true;
     private static boolean FETCH_NAME_LOCAL = true;

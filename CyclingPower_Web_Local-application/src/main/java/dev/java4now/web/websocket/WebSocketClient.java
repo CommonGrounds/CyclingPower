@@ -11,7 +11,8 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.util.Duration;
 
-import static dev.java4now.web.model.futures_fetcher.BASE_URL;
+import static dev.java4now.web.CyclingPower_Web_Local.BASE_URL;
+
 
 public class WebSocketClient {
 
