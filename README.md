@@ -46,6 +46,24 @@ WebFX is a revolutionary toolchain that allows developers to:
 
 ---
 
+## 📸 Screenshots
+
+<p align="center">
+   <img src=".screenshots/web_1.png" width="700">
+</p>
+
+<p align="center">
+   <img src=".screenshots/web_2.png" width="700">
+</p>
+
+<p align="center">
+   <img src=".screenshots/web_3.png" width="700">
+</p>
+
+<p align="center">
+   <img src=".screenshots/web_4.png" width="700">
+</p>
+
 ## 🌐 Live Demo
 
 Check out the live dashboard here:
