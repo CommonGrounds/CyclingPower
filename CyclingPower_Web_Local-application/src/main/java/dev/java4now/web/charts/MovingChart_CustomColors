@@ -1,0 +1,244 @@
+package dev.java4now.web.charts;
+
+import dev.webfx.extras.visual.VisualResult;
+import dev.webfx.platform.console.Console;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+
+import dev.webfx.extras.visual.controls.charts.VisualPieChart;
+import dev.webfx.extras.visual.VisualResultBuilder;
+import dev.webfx.extras.visual.VisualColumnBuilder;
+import dev.webfx.extras.visual.VisualColumn;
+import dev.webfx.extras.type.PrimType;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+public class MovingChart_CustomColors {
+
+    static VisualPieChart pieChart;
+    private static boolean colorsOverridden = false;
+
+    // Custom color palettes for Moving/Pause chart
+    private static final String[] MOVING_PAUSE_COLORS = {
+            "#4CAF50",  // Green for Moving
+            "#FF5722",  // Orange/Red for Pause
+            "#2196F3",  // Blue (if more series needed)
+            "#FFC107",  // Yellow
+            "#9C27B0",  // Purple
+            "#00BCD4",  // Cyan
+            "#8BC34A",  // Light Green
+            "#FF9800"   // Orange
+    };
+
+    // Alternative color schemes
+    private static final String[] VIBRANT_COLORS = {
+            "#FF6B6B",  // Coral for Moving
+            "#4ECDC4",  // Turquoise for Pause
+            "#45B7D1", "#96CEB4", "#FECA57", "#FF9FF3", "#54A0FF", "#5F27CD"
+    };
+
+    static {
+        // Try to override colors when class loads
+        overrideChartColors();
+    }
+
+    public static VBox get_chart(){
+        // Ensure colors are overridden before creating chart
+        if (!colorsOverridden) {
+            overrideChartColors();
+        }
+
+        pieChart = createPieChart();
+        return createChartWrapper(pieChart);
+    }
+
+    public static void resize(double width){
+        if(pieChart == null) return;
+        pieChart.setPrefWidth(width);
+        pieChart.requestLayout();
+        pieChart.layout();
+    }
+
+    /**
+     * MAIN COLOR OVERRIDE METHOD
+     * Tries multiple approaches to override the hardcoded colors
+     */
+    private static void overrideChartColors() {
+        if (colorsOverridden) return;
+
+        Console.log("Attempting to override WebFX chart colors...");
+
+        // Method 1: Reflection override
+        boolean success = overrideViaReflection(MOVING_PAUSE_COLORS);
+
+        // Method 2: System properties (fallback)
+        if (!success) {
+            setSystemProperties(MOVING_PAUSE_COLORS);
+        }
+
+        // Method 3: Try alternative class names
+        if (!success) {
+            success = tryAlternativeClasses(MOVING_PAUSE_COLORS);
+        }
+
+        colorsOverridden = success;
+        Console.log(success ? "Chart colors overridden successfully!" : "Color override failed - using defaults");
+    }
+
+    /**
+     * Method 1: Override via Java Reflection
+     */
+    private static boolean overrideViaReflection(String[] colors) {
+        try {
+            Class<?> peerClass = Class.forName("dev.webfx.extras.visual.controls.charts.peers.gwt.charba.GwtJ2clCharbaVisualChartPeer");
+            Field colorField = peerClass.getDeclaredField("JAVAFX_CHART_COLOR_PALETTE");
+            colorField.setAccessible(true);
+
+            // Remove final modifier
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(colorField, colorField.getModifiers() & ~Modifier.FINAL);
+
+            // Set new colors
+            colorField.set(null, colors);
+
+            Console.log("Colors overridden via reflection: " + String.join(", ", colors));
+            return true;
+
+        } catch (Exception e) {
+            Console.log("Reflection override failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Method 2: System Properties Approach
+     */
+    private static void setSystemProperties(String[] colors) {
+        String colorString = String.join(",", colors);
+        System.setProperty("webfx.chart.colors", colorString);
+        System.setProperty("javafx.chart.colors", colorString);
+        System.setProperty("charba.default.colors", colorString);
+
+        Console.log("Set system properties for colors: " + colorString);
+    }
+
+    /**
+     * Method 3: Try Alternative Class Names
+     */
+    private static boolean tryAlternativeClasses(String[] colors) {
+        String[] classNames = {
+                "dev.webfx.extras.visual.controls.charts.peers.base.VisualChartPeerBase",
+                "org.pepstock.charba.client.defaults.globals.DefaultsBuilder",
+                "org.pepstock.charba.client.ChartJS"
+        };
+
+        for (String className : classNames) {
+            try {
+                Class<?> clazz = Class.forName(className);
+                Field[] fields = clazz.getDeclaredFields();
+
+                for (Field field : fields) {
+                    if (field.getType() == String[].class &&
+                            field.getName().toUpperCase().contains("COLOR")) {
+
+                        field.setAccessible(true);
+
+                        try {
+                            Field modifiersField = Field.class.getDeclaredField("modifiers");
+                            modifiersField.setAccessible(true);
+                            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                        } catch (Exception ignored) {}
+
+                        field.set(null, colors);
+                        Console.log("Overrode colors in: " + className + "." + field.getName());
+                        return true;
+                    }
+                }
+            } catch (Exception e) {
+                // Continue to next class
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Utility method to switch color schemes
+     */
+    public static void setColorScheme(ColorScheme scheme) {
+        String[] colors = switch(scheme) {
+            case MOVING_PAUSE -> MOVING_PAUSE_COLORS;
+            case VIBRANT -> VIBRANT_COLORS;
+            case BUSINESS -> new String[]{"#2C3E50", "#3498DB", "#27AE60", "#E74C3C", "#F39C12", "#9B59B6", "#34495E", "#E67E22"};
+            case PASTEL -> new String[]{"#FFB3BA", "#BAFFC9", "#BAE1FF", "#FFFFBA", "#FFDFBA", "#E1BAFF", "#FFBAE1", "#BAFFFF"};
+        };
+
+        colorsOverridden = false; // Reset flag
+        overrideViaReflection(colors);
+        setSystemProperties(colors);
+    }
+
+    public enum ColorScheme {
+        MOVING_PAUSE,  // Green/Red for Moving/Pause
+        VIBRANT,       // Bright colors
+        BUSINESS,      // Professional colors
+        PASTEL         // Soft colors
+    }
+
+    // Chart wrapper (unchanged)
+    private static VBox createChartWrapper(VisualPieChart chart) {
+        Tab chartTab = new Tab("", chart);
+        chartTab.setClosable(false);
+
+        TabPane wrapper = new TabPane(chartTab);
+        wrapper.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        wrapper.getStyleClass().add("no-tabs");
+
+        var root = new VBox(wrapper);
+        root.setAlignment(Pos.CENTER);
+        return root;
+    }
+
+    // Data creation with percentage formatting (unchanged but improved)
+    private static VisualResult createRowFormatPieVisualResult(double moving, double pause) {
+        VisualResultBuilder vrb = new VisualResultBuilder(2,
+                new VisualColumnBuilder(null, PrimType.STRING).setRole("series").build(),
+                VisualColumn.create(null, PrimType.DOUBLE)
+        );
+
+        moving = moving * 100;
+        pause = pause * 100;
+
+        vrb.setValue(0, 0, String.format("Moving (%.1f%%)", moving));
+        vrb.setValue(0, 1, moving);
+        vrb.setValue(1, 0, String.format("Pause (%.1f%%)", pause));
+        vrb.setValue(1, 1, pause);
+
+        return vrb.build();
+    }
+
+    private static VisualPieChart createPieChart(){
+        VisualPieChart chart = new VisualPieChart();
+        chart.setVisualResult(createRowFormatPieVisualResult(0.0, 1.0));
+        chart.getStyleClass().addAll("moving-pause-chart", "custom-colors");
+        chart.setMaxSize(javafx.scene.layout.Region.USE_PREF_SIZE,
+                javafx.scene.layout.Region.USE_PREF_SIZE);
+        return chart;
+    }
+
+    // Updated data method (unchanged)
+    public static void update_data(double total, double moving_total) {
+        if(pieChart == null) return;
+
+        Console.log("Total: " + total + ", Moving Total: " + moving_total);
+        double moving = moving_total / total;
+        double pause = 1.0 - moving;
+
+        Console.log("Moving: " + String.format("%.2f%%", moving * 100) +
+                ", Pause: " + String.format("%.2f%%", pause * 100));
+
+        pieChart.setVisualResult(createRowFormatPieVisualResult(moving, pause));
+    }
+}

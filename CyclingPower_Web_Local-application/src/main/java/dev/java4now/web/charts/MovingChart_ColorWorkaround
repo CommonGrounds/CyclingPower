@@ -1,0 +1,218 @@
+package dev.java4now.web.charts;
+
+import dev.webfx.extras.visual.VisualResult;
+import dev.webfx.platform.console.Console;
+import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.control.*;
+
+import dev.webfx.extras.visual.controls.charts.VisualPieChart;
+import dev.webfx.extras.visual.controls.charts.VisualBarChart;
+import dev.webfx.extras.visual.controls.charts.VisualLineChart;
+import dev.webfx.extras.visual.controls.charts.VisualAreaChart;
+import dev.webfx.extras.visual.controls.charts.VisualScatterChart;
+import dev.webfx.extras.visual.VisualResultBuilder;
+import dev.webfx.extras.visual.VisualColumnBuilder;
+import dev.webfx.extras.visual.VisualColumn;
+import dev.webfx.extras.type.PrimType;
+
+/**
+ * PRACTICAL WORKAROUND: Use Data Ordering to Control Colors
+ *
+ * Since WebFX uses this hardcoded color array:
+ * {"#f3622d", "#fba71b", "#57b757", "#41a9c9", "#4258c9", "#9a42c8", "#c84164", "#888888"}
+ *  Orange,    Yellow,    Green,     LightBlue, Blue,      Purple,    Pink,      Gray
+ *
+ * We can arrange our data to use the colors we prefer!
+ */
+
+public class MovingChart_ColorWorkaround {
+
+    static VisualPieChart pieChart;
+
+    // Map desired colors to data order
+    // Index 0 = "#f3622d" (Orange) - good for activity/moving
+    // Index 1 = "#fba71b" (Yellow) - could work for pause
+    // Index 2 = "#57b757" (Green) - excellent for moving/active
+    // Index 3 = "#41a9c9" (Light Blue) - good for pause/rest
+    // Index 4 = "#4258c9" (Blue) - good for pause/rest
+    // Index 5 = "#9a42c8" (Purple)
+    // Index 6 = "#c84164" (Pink/Red)
+    // Index 7 = "#888888" (Gray)
+
+    public static VBox get_chart() {
+        pieChart = createPieChart();
+        return createChartWrapper(pieChart);
+    }
+
+    public static void resize(double width) {
+        if (pieChart == null) return;
+        pieChart.setPrefWidth(width);
+        pieChart.requestLayout();
+        pieChart.layout();
+    }
+
+    /**
+     * APPROACH 1: Order data to get desired colors
+     * Put "Moving" first to get Green (#57b757) and "Pause" second to get Light Blue (#41a9c9)
+     */
+    private static VisualResult createColorOptimizedPieData(double moving, double pause) {
+        VisualResultBuilder vrb = new VisualResultBuilder(2,
+                new VisualColumnBuilder(null, PrimType.STRING).setRole("series").build(),
+                VisualColumn.create(null, PrimType.DOUBLE)
+        );
+
+        moving = moving * 100;
+        pause = pause * 100;
+
+        // Order matters! This determines which hardcoded color is used:
+        // First series gets color index 2 (Green) - perfect for Moving
+        // Second series gets color index 3 (Light Blue) - good for Pause
+
+        // We can reorder to get the colors we want:
+        vrb.setValue(0, 0, String.format("Moving (%.1f%%)", moving));
+        vrb.setValue(0, 1, moving);
+        vrb.setValue(1, 0, String.format("Pause (%.1f%%)", pause));
+        vrb.setValue(1, 1, pause);
+
+        return vrb.build();
+    }
+
+    /**
+     * APPROACH 2: Add dummy data to shift color indices
+     * Add invisible/zero-value series to shift to preferred colors
+     */
+    private static VisualResult createColorShiftedPieData(double moving, double pause) {
+        VisualResultBuilder vrb = new VisualResultBuilder(4,
+                new VisualColumnBuilder(null, PrimType.STRING).setRole("series").build(),
+                VisualColumn.create(null, PrimType.DOUBLE)
+        );
+
+        moving = moving * 100;
+        pause = pause * 100;
+
+        // Add dummy entries to shift to desired colors:
+        // Index 0: Dummy (gets Orange #f3622d) - we skip this
+        // Index 1: Dummy (gets Yellow #fba71b) - we skip this
+        // Index 2: Moving (gets Green #57b757) - perfect!
+        // Index 3: Pause (gets Light Blue #41a9c9) - good!
+
+        vrb.setValue(0, 0, ""); // Invisible dummy
+        vrb.setValue(0, 1, 0.0);
+        vrb.setValue(1, 0, ""); // Invisible dummy
+        vrb.setValue(1, 1, 0.0);
+        vrb.setValue(2, 0, String.format("Moving (%.1f%%)", moving));
+        vrb.setValue(2, 1, moving);
+        vrb.setValue(3, 0, String.format("Pause (%.1f%%)", pause));
+        vrb.setValue(3, 1, pause);
+
+        return vrb.build();
+    }
+
+    /**
+     * APPROACH 3: Strategic data ordering for best available colors
+     * Use the natural order but strategically choose which gets which color
+     */
+    private static VisualResult createStrategicColorData(double moving, double pause) {
+        VisualResultBuilder vrb = new VisualResultBuilder(2,
+                new VisualColumnBuilder(null, PrimType.STRING).setRole("series").build(),
+                VisualColumn.create(null, PrimType.DOUBLE)
+        );
+
+        moving = moving * 100;
+        pause = pause * 100;
+
+        // Available colors in order:
+        // 0: "#f3622d" (Orange/Red) - good for activity
+        // 1: "#fba71b" (Yellow) - neutral
+        // 2: "#57b757" (Green) - excellent for moving/active
+        // 3: "#41a9c9" (Light Blue) - good for rest/pause
+
+        // Strategy: Put higher value first to make it more prominent with better color
+        if (moving >= pause) {
+            // Moving is higher - give it the first color (Orange/Red - active color)
+            vrb.setValue(0, 0, String.format("Moving (%.1f%%)", moving));
+            vrb.setValue(0, 1, moving);
+            vrb.setValue(1, 0, String.format("Pause (%.1f%%)", pause));
+            vrb.setValue(1, 1, pause);
+        } else {
+            // Pause is higher - but we still want moving to get the active color
+            // So we keep the same order
+            vrb.setValue(0, 0, String.format("Moving (%.1f%%)", moving));
+            vrb.setValue(0, 1, moving);
+            vrb.setValue(1, 0, String.format("Pause (%.1f%%)", pause));
+            vrb.setValue(1, 1, pause);
+        }
+
+        return vrb.build();
+    }
+
+    // Chart creation and wrapper methods (unchanged)
+    private static VBox createChartWrapper(VisualPieChart chart) {
+        Tab chartTab = new Tab("", chart);
+        chartTab.setClosable(false);
+
+        TabPane wrapper = new TabPane(chartTab);
+        wrapper.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        wrapper.getStyleClass().add("no-tabs");
+
+        var root = new VBox(wrapper);
+        root.setAlignment(Pos.CENTER);
+        return root;
+    }
+
+    private static VisualPieChart createPieChart() {
+        VisualPieChart chart = new VisualPieChart();
+
+        // Choose which color approach to use:
+        chart.setVisualResult(createColorOptimizedPieData(0.0, 1.0));
+        // Or: chart.setVisualResult(createColorShiftedPieData(0.0, 1.0));
+        // Or: chart.setVisualResult(createStrategicColorData(0.0, 1.0));
+
+        chart.getStyleClass().addAll("moving-pause-chart");
+        chart.setMaxSize(javafx.scene.layout.Region.USE_PREF_SIZE,
+                javafx.scene.layout.Region.USE_PREF_SIZE);
+        return chart;
+    }
+
+    public static void update_data(double total, double moving_total) {
+        if (pieChart == null) return;
+
+        Console.log("Total: " + total + ", Moving Total: " + moving_total);
+        double moving = moving_total / total;
+        double pause = 1.0 - moving;
+
+        Console.log("Moving: " + String.format("%.2f%%", moving * 100) +
+                ", Pause: " + String.format("%.2f%%", pause * 100));
+
+        // Update with your chosen color approach:
+        pieChart.setVisualResult(createColorOptimizedPieData(moving, pause));
+    }
+
+    /**
+     * BONUS: Method to test different color approaches
+     */
+    public static void setColorApproach(ColorApproach approach, double moving, double pause) {
+        if (pieChart == null) return;
+
+        VisualResult result = switch (approach) {
+            case NATURAL_ORDER -> createColorOptimizedPieData(moving, pause);
+            case COLOR_SHIFTED -> createColorShiftedPieData(moving, pause);
+            case STRATEGIC -> createStrategicColorData(moving, pause);
+        };
+
+        pieChart.setVisualResult(result);
+    }
+
+    public enum ColorApproach {
+        NATURAL_ORDER,
+        COLOR_SHIFTED,
+        STRATEGIC
+    }
+}

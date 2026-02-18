@@ -1,0 +1,502 @@
+package dev.java4now.web.model;
+
+import dev.webfx.platform.ast.ReadOnlyAstArray;
+import dev.webfx.platform.ast.ReadOnlyAstObject;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static dev.java4now.web.util.Helper_light.formatDate;
+
+public class CyclingActivity {
+    private List<RecordData> records;
+    private SessionData session;
+    private DeviceInfo deviceInfo;
+    private String descriptiveName;
+
+    public CyclingActivity() {
+    }
+
+    public static CyclingActivity fromJson(ReadOnlyAstObject json) {
+        CyclingActivity activity = new CyclingActivity();
+
+        // Handle records
+        ReadOnlyAstArray recordsArray = json.getArray("records");
+        if (recordsArray != null) {
+            activity.setRecords(parseRecords(recordsArray));
+        } else {
+            activity.setRecords(new ArrayList<>()); // Empty list if records are missing
+        }
+
+        // Handle session with null check
+        ReadOnlyAstObject sessionJson = json.getObject("session");
+        if (sessionJson != null) {
+            activity.setSession(SessionData.fromJson(sessionJson));
+        } else {
+            activity.setSession(null); // Set to null if session is missing
+        }
+
+        // Handle deviceInfo with null check
+        ReadOnlyAstObject deviceJson = json.getObject("deviceInfo");
+        if (deviceJson != null) {
+            activity.setDeviceInfo(DeviceInfo.fromJson(deviceJson));
+        } else {
+            activity.setDeviceInfo(null); // Set to null if deviceInfo is missing
+        }
+
+//        date = formatDate(activity.getRecords().get(0).timestamp);
+//        Console.log(date);
+
+        return activity;
+    }
+
+    private static List<RecordData> parseRecords(ReadOnlyAstArray array) {
+        if (array == null) {
+            return new ArrayList<>(); // Return empty list if array is null
+        }
+        List<RecordData> records = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            ReadOnlyAstObject jsonRecord = array.getObject(i);
+            if (jsonRecord != null) {
+                records.add(RecordData.fromJson(jsonRecord));
+            }
+        }
+        return records;
+    }
+
+
+    // Overriding toString() for debugging
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n  \"records\": [\n");
+        if (records != null) {
+            for (int i = 0; i < records.size(); i++) {
+                sb.append("    ").append(records.get(i).toString());
+                if (i < records.size() - 1) sb.append(",\n");
+            }
+        }
+        sb.append("\n  ],\n  \"session\": ").append(session != null ? session.toString() : "null")
+                .append(",\n  \"deviceInfo\": ").append(deviceInfo != null ? deviceInfo.toString() : "null")
+                .append("\n}");
+        return sb.toString();
+    }
+
+    // Getters and setters
+    public List<RecordData> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<RecordData> records) {
+        this.records = records;
+    }
+
+    public SessionData getSession() {
+        return session;
+    }
+
+    public void setSession(SessionData session) {
+        this.session = session;
+    }
+
+    public DeviceInfo getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(DeviceInfo deviceInfo) {
+        this.deviceInfo = deviceInfo;
+    }
+
+
+    public void setDescriptiveName(String descriptiveName_str) {
+        descriptiveName = descriptiveName_str;
+    }
+
+    public String getDescriptiveName() {
+        return descriptiveName != null ? descriptiveName : "Unnamed Activity";
+    }
+
+    public static class RecordData {
+        private long timestamp;
+        private double latitude;
+        private double longitude;
+        private float speed;
+        private int power;
+        private short cadence;
+        private float altitude;
+        private float grade;
+        private float distance;
+        private int calories;
+        private int temperature = 0;
+        private float windSpeed;
+        private int rotation; // deg
+        private String direction;
+        private String heading;
+
+        public RecordData() {
+        }
+
+        public static RecordData fromJson(ReadOnlyAstObject json) {
+            RecordData record = new RecordData();
+            record.setTimestamp(json.getLong("timestamp"));
+            record.setLatitude(json.getDouble("latitude"));
+            record.setLongitude(json.getDouble("longitude"));
+            record.setSpeed((float) json.getDouble("speed").floatValue());
+            record.setPower(json.getInteger("power"));
+            record.setCadence((short) json.getInteger("cadence").floatValue());
+            record.setAltitude((float) json.getDouble("altitude").floatValue());
+            record.setGrade((float) json.getDouble("grade").floatValue());
+            record.setDistance((float) json.getDouble("distance").floatValue());
+            record.setCalories(json.getInteger("calories"));
+            record.setTemperature(json.getInteger("temperature",0));
+            record.setWindSpeed((float) json.getDouble("WindSpeed",0.0).floatValue());
+            record.setRotation(json.getInteger("Rotation",0));
+            record.setDirection(json.getString("Direction",""));
+            record.setHeading(json.getString("Heading",""));
+
+            return record;
+        }
+
+        // Overriding toString() for debugging
+        @Override
+        public String toString() {
+            return "{\n      \"timestamp\": " + timestamp +
+                    ",\n      \"latitude\": " + latitude +
+                    ",\n      \"longitude\": " + longitude +
+                    ",\n      \"speed\": " + speed +
+                    ",\n      \"power\": " + power +
+                    ",\n      \"cadence\": " + cadence +
+                    ",\n      \"altitude\": " + altitude +
+                    ",\n      \"grade\": " + grade +
+                    ",\n      \"distance\": " + distance +
+                    ",\n      \"calories\": " + calories +
+                    ",\n      \"temperature\": " + temperature +
+                    ",\n      \"windSpeed\": " + windSpeed +
+                    ",\n      \"rotation\": " + rotation +
+                    ",\n      \"direction\": " + direction +
+                    ",\n      \"heading\": " + heading +
+                    "\n    }";
+        }
+
+        // Getters and setters
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(double latitude) {
+            this.latitude = latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
+
+        public void setSpeed(float speed) {
+            this.speed = speed;
+        }
+
+        public int getPower() {
+            return power;
+        }
+
+        public void setPower(int power) {
+            this.power = power;
+        }
+
+        public short getCadence() {
+            return cadence;
+        }
+
+        public void setCadence(short cadence) {
+            this.cadence = cadence;
+        }
+
+        public float getAltitude() {
+            return altitude;
+        }
+
+        public void setAltitude(float altitude) {
+            this.altitude = altitude;
+        }
+
+        public float getGrade() {
+            return grade;
+        }
+
+        public void setGrade(float grade) {
+            this.grade = grade;
+        }
+
+        public float getDistance() {
+            return distance;
+        }
+
+        public void setDistance(float distance) {
+            this.distance = distance;
+        }
+
+        public int getCalories() {
+            return calories;
+        }
+
+        public void setCalories(int calories) {
+            this.calories = calories;
+        }
+
+        public int getTemperature() {
+            return temperature;
+        }
+
+        public void setTemperature(int temperature) {
+            this.temperature = temperature;
+        }
+
+        public float getWindSpeed() {
+            return windSpeed;
+        }
+
+        public void setWindSpeed(float windSpeed) {
+            this.windSpeed = windSpeed;
+        }
+
+        public int getRotation() {
+            return rotation;
+        }
+
+        public void setRotation(int rotation) {
+            this.rotation = rotation;
+        }
+
+        public String getDirection() {
+            return direction;
+        }
+
+        public void setDirection(String direction) {
+            this.direction = direction;
+        }
+
+        public String getHeading() {
+            return heading;
+        }
+
+        public void setHeading(String heading) {
+            this.heading = heading;
+        }
+    }
+
+    public static class SessionData {
+        private long startTime;
+        private float totalElapsedTime;
+        private float totalMovingTime;
+        private float totalDistance;
+        private int totalCalories;
+        private float avgCadence;
+        private float avgPower;
+        private float avgSpeed;
+        private float maxAltitude;
+        private float minAltitude;
+        private LocalDate date; // Add this field
+        private int weather=100;
+
+        public SessionData() {
+        }
+
+        public static SessionData fromJson(ReadOnlyAstObject json) {
+            SessionData session = new SessionData();
+            session.setStartTime(json.getLong("startTime"));
+            session.setTotalElapsedTime((float) json.getDouble("totalElapsedTime").floatValue());
+            session.setTotalMovingTime((float) json.getDouble("totalMovingTime").floatValue());
+            session.setTotalDistance((float) json.getDouble("totalDistance").floatValue());
+            session.setTotalCalories(json.getInteger("totalCalories"));
+            session.setAvgCadence((float) json.getDouble("avgCadence",0.0).floatValue());
+            session.setAvgPower((float) json.getDouble("avgPower").floatValue());
+            session.setAvgSpeed((float) json.getDouble("avgSpeed").floatValue());
+            session.setMaxAltitude((float) json.getDouble("maxAltitude").floatValue());
+            session.setMinAltitude((float) json.getDouble("minAltitude").floatValue());
+            session.setWeather(json.getInteger("Weather",100));
+
+            session.date = formatDate(session.getStartTime());
+//            Console.log(session.date.getYear() + ":" + session.date.getMonth());
+
+            return session;
+        }
+
+        // Overriding toString() for debugging
+        @Override
+        public String toString() {
+            return "{\n    \"startTime\": " + startTime +
+                    ",\n    \"totalElapsedTime\": " + totalElapsedTime +
+                    ",\n    \"totalMovingTime\": " + totalMovingTime +
+                    ",\n    \"totalDistance\": " + totalDistance +
+                    ",\n    \"totalCalories\": " + totalCalories +
+                    ",\n    \"avgCadence\": " + avgCadence +
+                    ",\n    \"avgPower\": " + avgPower +
+                    ",\n    \"avgSpeed\": " + avgSpeed +
+                    ",\n    \"maxAltitude\": " + maxAltitude +
+                    ",\n    \"minAltitude\": " + minAltitude +
+                    ",\n    \"Weather\": " + weather +
+                    "\n  }";
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        // Getters and setters
+        public long getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(long startTime) {
+            this.startTime = startTime;
+        }
+
+        public float getTotalElapsedTime() {
+            return totalElapsedTime;
+        }
+
+        public void setTotalElapsedTime(float totalElapsedTime) {
+            this.totalElapsedTime = totalElapsedTime;
+        }
+
+        public float getTotalDistance() {
+            return totalDistance;
+        }
+
+        public void setTotalDistance(float totalDistance) {
+            this.totalDistance = totalDistance;
+        }
+
+        public int getTotalCalories() {
+            return totalCalories;
+        }
+
+        public void setTotalCalories(int totalCalories) {
+            this.totalCalories = totalCalories;
+        }
+
+        public float getAvgCadence() {
+            return avgCadence;
+        }
+
+        public void setAvgCadence(float avgCadence) {
+            this.avgCadence = avgCadence;
+        }
+
+        public float getAvgPower() {
+            return avgPower;
+        }
+
+        public void setAvgPower(float avgPower) {
+            this.avgPower = avgPower;
+        }
+
+        public float getAvgSpeed() {
+            return avgSpeed;
+        }
+
+        public void setAvgSpeed(float avgSpeed) {
+            this.avgSpeed = avgSpeed;
+        }
+
+        public float getMaxAltitude() {
+            return maxAltitude;
+        }
+
+        public void setMaxAltitude(float maxAltitude) {
+            this.maxAltitude = maxAltitude;
+        }
+
+        public float getMinAltitude() {
+            return minAltitude;
+        }
+
+        public void setMinAltitude(float minAltitude) {
+            this.minAltitude = minAltitude;
+        }
+
+        public float getTotalMovingTime() {
+            return totalMovingTime;
+        }
+
+        public void setTotalMovingTime(float totalMovingTime) {
+            this.totalMovingTime = totalMovingTime;
+        }
+
+        public int getWeather() {
+            return weather;
+        }
+
+        public void setWeather(int weather) {
+            this.weather = weather;
+        }
+    }
+
+    public static class DeviceInfo {
+        private long timestamp;
+        private String batteryLevel;
+        private String productName;
+
+        public DeviceInfo() {
+        }
+
+        public static DeviceInfo fromJson(ReadOnlyAstObject json) {
+            DeviceInfo device = new DeviceInfo();
+            device.setTimestamp(json.getLong("timestamp"));
+            device.setBatteryLevel(json.getString("batteryLevel"));
+            device.setProductName(json.getString("productName"));
+            return device;
+        }
+
+        // Overriding toString() for debugging
+        @Override
+        public String toString() {
+            return "{\n    \"timestamp\": " + timestamp +
+                    ",\n    \"batteryLevel\": \"" + batteryLevel + "\"" +
+                    ",\n    \"productName\": \"" + productName + "\"" +
+                    "\n  }";
+        }
+
+        // Getters and setters
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public String getBatteryLevel() {
+            return batteryLevel;
+        }
+
+        public void setBatteryLevel(String batteryLevel) {
+            this.batteryLevel = batteryLevel;
+        }
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+    }
+}

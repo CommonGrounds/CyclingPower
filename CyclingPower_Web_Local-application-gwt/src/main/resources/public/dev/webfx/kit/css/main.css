@@ -1,0 +1,1502 @@
+
+/*===== webfx-kit-javafxgraphics-web@main.css from webfx-kit-javafxgraphics-peers-elemental2 =====*/
+
+:root {
+    /* Capturing safe area in CSS variables so they can be accessed by WebFX kit */
+    --safe-area-inset-top:    env(safe-area-inset-top);
+    --safe-area-inset-right:  env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left:   env(safe-area-inset-left);
+
+    /* Text selection mode */
+    --text-user-select: text; /* for texts */
+    --body-user-select: none; /* for everything else */
+
+    /* CSS variables for backgrounds (in JavaFX Region) */
+    --fx-background-color: transparent;
+    --fx-background-image: none;
+    --fx-background-position: none;
+    --fx-background-repeat: none;
+    --fx-background-size: none;
+    --fx-background-radius: var(--fx-border-radius);
+
+    /* CSS variables for borders (in JavaFX Region) */
+    --fx-border-style: none;
+    --fx-border-color: transparent;
+    --fx-border-width: 0;
+    --fx-border-radius: 0;
+
+    /* CSS variables for text fill and svg path fill */
+    --fx-text-fill: black;
+
+    --fx-svg-path-fill: var(--fx-fill);
+
+    /* CSS variable for focus appearance */
+    --fx-focus-color: #0096D6;
+
+    --fx-kit-line-height: 1; /* Default variable for text line height managed by the webfx kit. App CSS can't override
+    it (because it's set at the text element level), but can set --fx-line-height which precedes --fx-kit-line-height */
+}
+
+.unset-variables { /* Dummy selector used just to list unset CSS variables that can be overridden by App CSS */
+    --fx-padding: 0;
+    --fx-padding-top: 0;
+    --fx-padding-right: 0;
+    --fx-padding-bottom: 0;
+    --fx-padding-left: 0;
+    --fx-line-height: 1;
+    --fx-fill: transparent;
+    --fx-stroke: transparent;
+    --fx-stroke-width: 1px;
+    --fx-stroke-style: solid;
+    --fx-stroke-linecap: round;
+    --fx-stroke-linejoin: round;
+    --fx-svg-path-stroke: transparent;
+    --fx-svg-path-stroke-width: 1;
+    --fx-svg-path-stroke-linecap: round;
+    --fx-svg-path-stroke-linejoin: round;
+}
+
+/* Mocking some basic JavaFX behaviours */
+
+html, body {
+    height: 100dvh;
+    /* Also disabling overscroll (prevents SpaceFX ship drag to work when coming back to PWA on iOS) */
+    overscroll-behavior: none;
+}
+
+body {
+    overflow: hidden; /* Disabling browser horizontal and vertical scroll bars */
+    margin: 0; /* Removing the default margin around the body */
+    /* Disabling user selection by default (like in JavaFX) but enabling selection on text (as opposed to JavaFX - see fx-text CSS rule)  */
+    -webkit-user-select: var(--body-user-select);
+    -moz-user-select: var(--body-user-select);
+    -ms-user-select: var(--body-user-select);
+    user-select: var(--body-user-select);
+    -webkit-touch-callout: none;
+}
+
+fx-scene { /* main stage scene or popup scenes */
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+body > fx-scene { /* main stage scene only */
+    height: 100dvh;
+}
+
+/* Workaround for iOS Safari bug not returning the correct initial window height for PWA with 'black-translucent' status bar (such as SpaceFX PWA) */
+body { /* Although we don't want that padding, we apply it initially because this fixes the bug. GwtJ2clPrimaryStagePeer will then erase that padding */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Making disabled nodes semi-transparent */
+.disabled {
+    opacity: 50%;
+}
+
+/* Disabling default focus outline (focus appearance will be set by other rules in this CSS or javafx-controls CSS) */
+:focus,
+:focus-visible {
+    outline: none;
+}
+
+/* === New: Single-host Region rendering without intermediate fx-* nodes === */
+/* Apply background on the host and draw the border on ::before using the SAME variables */
+[fx-border-overlay] {
+    /* Background from existing variables */
+    background-color: var(--fx-background-color);
+    background-image: var(--fx-background-image);
+    background-position: var(--fx-background-position);
+    background-repeat: var(--fx-background-repeat);
+    background-size: var(--fx-background-size);
+    border-radius: var(--fx-background-radius);
+
+    /* Anchor ::before */
+    position: relative;
+    /* Ensure width/height include padding set via variables (outer size stable) */
+    box-sizing: border-box;
+    /* Ensure native border is not used (we overlay instead) */
+    border: none;
+
+    /* WebFX padding: allow CSS to communicate padding to Java without shifting the visual border
+       (the ::before overlay will expand back out to the border box using negative insets) */
+    padding: var(--fx-padding-top, var(--fx-padding, 0px)) var(--fx-padding-right, var(--fx-padding, 0px)) var(--fx-padding-bottom, var(--fx-padding, 0px)) var(--fx-padding-left, var(--fx-padding, 0px));
+}
+
+[fx-border-overlay]::before {
+    content: "";
+    position: absolute;
+    /* Draw inside the host padding box to avoid clipping issues */
+    inset: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+
+    border-style: var(--fx-border-style);
+    border-color: var(--fx-border-color);
+    border-width: var(--fx-border-width);
+    border-radius: var(--fx-border-radius, inherit);
+}
+
+/* Optional: opt-in to draw the border at the outer edge (outside padding) when safe.
+   Use only on elements that are not clipped by ancestors and don’t need the border
+   to be inside padding. */
+[fx-border-overlay][data-fx-border-outside=""]::before {
+    inset: calc(0px - var(--fx-padding-top,    var(--fx-padding, 0px)))
+           calc(0px - var(--fx-padding-right,  var(--fx-padding, 0px)))
+           calc(0px - var(--fx-padding-bottom, var(--fx-padding, 0px)))
+           calc(0px - var(--fx-padding-left,   var(--fx-padding, 0px)));
+}
+
+/* Prevent parent Region variables from leaking into nested Region hosts.
+   By resetting variables on any descendant host, we break inheritance at each Region boundary.
+   Control/skin/app rules can still override these defaults on the child element. */
+/* Use :where() to keep specificity at 0 so component/control rules can override */
+:where([fx-border-overlay]) :where([fx-border-overlay]),
+/* Stop propagation of background/border variables to non-host children (replacement for fx-children)
+   Do NOT reset variables on child elements that are themselves Region hosts (they carry fx-border-overlay). */
+[fx-border-overlay] > :not([fx-border-overlay]):not([fx-no-border-overlay]) { /* fx-no-border-overlay is for regions where :before border doesn't work (e.g. textarea) */
+    --fx-background-color: transparent;
+    --fx-background-radius: var(--fx-border-radius);
+    --fx-background-image: none;
+    --fx-background-position: none;
+    --fx-background-repeat: none;
+    --fx-background-size: none;
+    --fx-border-style: solid;
+    --fx-border-color: transparent;
+    --fx-border-radius: 0;
+    --fx-border-width: 0;
+}
+
+/* Optional fast path: uniform solid border via inset box-shadow */
+[fx-border-overlay][data-fx-border-solid=""] {
+    box-shadow: inset 0 0 0 var(--fx-border-width) var(--fx-border-color);
+}
+[fx-border-overlay][data-fx-border-solid=""]::before {
+    border-width: 0;
+}
+
+/* The default JavaFX behaviour for Text wrapping is equivalent to HTML "break-word", which is not the default in HTML
+   (the default in HTML being "normal"). So we apply "break-word". */
+fx-text {
+    color: var(--fx-text-fill);
+    word-break: break-word;
+    overflow-wrap: break-word; /* fallback for better browser support */
+    /* Also enabling selection on text (as opposed to JavaFX, but it's expected by most web users) */
+    -webkit-user-select: var(--text-user-select);
+    -moz-user-select: var(--text-user-select);
+    -ms-user-select: var(--text-user-select);
+    user-select: var(--text-user-select);
+
+    line-height: var(--fx-line-height, var(--fx-kit-line-height));
+}
+
+fx-circle, fx-rectangle {
+    background-color: var(--fx-fill);
+    border-color: var(--fx-stroke, transparent);
+    border-width: var(--fx-stroke-width, 1px);
+    border-style: var(--fx-stroke-style, solid);
+}
+
+/* Applying the default JavaFX behaviour for SVGPath - Note that CSS fill is prioritized over SVG fill! */
+fx-svgpath svg path:not([fill]):not([stroke]) { /* if the application code didn't set neither fill nor stroke */
+    fill: var(--fx-svg-path-fill, var(--fx-fill));
+}
+
+fx-svgpath svg path:not([fill])[stroke] { /* if the application code set the stroke but not the fill */
+    --fx-svg-path-fill: transparent; /* then the fill is transparent */
+    fill: var(--fx-svg-path-fill, var(--fx-fill));
+}
+
+fx-svgpath svg path:not([stroke]) {
+    stroke: var(--fx-svg-path-stroke, var(--fx-stroke)); /* unset by default */
+}
+
+fx-svgpath svg path:not([stroke-width]) {
+    stroke-width: var(--fx-svg-path-stroke-width, var(--fx-stroke-width));
+}
+
+fx-svgpath svg path:not([stroke-linecap]) {
+    stroke-linecap: var(--fx-svg-path-stroke-linecap, var(--fx-stroke-linecap));
+}
+
+fx-svgpath svg path:not([stroke-linejoin]) {
+    stroke-linejoin: var(--fx-svg-path-stroke-linejoin, var(--fx-stroke-linejoin));
+}
+/*===== webfx-kit-javafxcontrols-web@main.css from webfx-kit-javafxcontrols-peers-elemental2 =====*/
+
+/***** Global variables *****/
+:root {
+    --fx-tabheaderarea-background-color: #D3D3D3;
+    --fx-tabheaderarea-border-radius: 0;
+    --fx-tabheaderarea-padding-top: 5px;
+    --fx-tabheaderarea-padding-bottom: 0;
+    --fx-tabheaderarea-padding-left: 10px;
+    --fx-tabheaderarea-padding-right: 0;
+    --fx-tabheader-background-color: #e5e5e5;
+    --fx-tabheader-background-color-selected: #f5f5f5;
+    --fx-tabheader-border-radius: 5px 5px 0 0;
+    --fx-tabheader-border-style: solid;
+    --fx-tabheader-border-color: darkgray;
+    --fx-tabheader-border-width: 1px;
+    --fx-tabheader-border-width-selected: 1px 1px 0 1px;
+    --fx-tabheader-padding-top: 3px;
+    --fx-tabheader-padding-bottom: 3px;
+    --fx-tabheader-padding-left: 10px;
+    --fx-tabheader-padding-right: 10px;
+    --fx-tabheader-text-fill: var(--fx-text-fill);
+    --fx-tabheader-text-fill-selected: var(--fx-text-fill);
+
+    --fx-theme-color: #0095cb;
+    --fx-placholder-color: #888;
+    --fx-progress-indicator-color: var(--fx-theme-color);
+    --fx-hyperlink-text-fill: var(--fx-theme-color);
+    --fx-checkbox-background-color: var(--fx-theme-color);
+    --fx-checkbox-border-color: var(--fx-text-fill);
+    --fx-radiobutton-background-color: var(--fx-theme-color);
+    --fx-radiobutton-border-color: var(--fx-text-fill);
+}
+
+::placeholder {
+    color: var(--fx-placholder-color);
+}
+
+/* Without this rule, the context menu is wrongly shifted up by the browser the first time it is displayed */
+fx-scene > * {
+    overflow: hidden;
+}
+
+/* Applying text color to svg path as well by default */
+fx-label, fx-button, fx-togglebutton {
+    --fx-svg-path-fill: var(--fx-text-fill);
+}
+
+fx-hyperlink {
+    --fx-text-fill: var(--fx-hyperlink-text-fill);
+}
+
+fx-hyperlink fx-text:hover {
+    text-decoration: underline;
+}
+
+/* Removing borders, outlines and background for input elements (to not interfere with the text field below) */
+input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+/* Removing spinner buttons on number inputs. Reasons: 1) Not in JavaFX 2) Make the text field narrower which can cause
+ unwanted clip on the number, ex: on FireFox when app code call setPrefWith(80) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+/* and for FireFox: */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+fx-button, fx-togglebutton {
+    --fx-background-color: white;
+    --fx-border-style: solid;
+    --fx-border-color: #c0c0c0;
+    --fx-border-width: 1px;
+    --fx-border-radius: 5px;
+    --text-user-select: none;
+}
+
+.text-field {
+    --fx-background-color: white;
+    --fx-border-style: solid;
+    --fx-border-color: #c0c0c0;
+    --fx-border-width: 1px;
+    --fx-border-radius: 5px;
+}
+
+textarea {
+    padding: 8px;
+    box-sizing: border-box;
+    outline: none;
+
+    /* textarea has fx-no-border-overlay instead of fx-border-overlay (because :before for borders doesn't work on textarea), so we apply the border styles directly to it */
+    border-style: var(--fx-border-style);
+    border-color: var(--fx-border-color);
+    border-width: var(--fx-border-width);
+    border-radius: var(--fx-border-radius, inherit);
+}
+
+textarea:focus {
+    --fx-border-color: var(--fx-focus-color);
+}
+
+fx-titledpane textarea {
+    --fx-border-radius: 0 0 5px 5px;
+}
+
+/* Cross for the tab close button */
+.tab-close-button {
+    --fx-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23444' stroke-width='2' stroke-linejoin='round' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M 4,4 L 12,12 Z M 4,12 L 12,4 Z\'/%3E%3C/svg%3E");
+}
+
+fx-menuitemcontainer:focus {
+    --fx-background-color: var(--fx-focus-color);
+    --fx-text-fill: white;
+}
+
+/* Ellipsis management for wrapped text inside a label with restricted height */
+
+fx-label.ellipsis {
+    overflow: hidden;
+}
+
+fx-label.ellipsis fx-text {
+    /*text-overflow: ellipsis;*/
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    /* -webkit-line-clamp will be set in JS by HtmlTextPeer */
+}
+
+fx-progressindicator .spinner .segment {
+    background-color: var(--fx-progress-indicator-color);
+}
+
+fx-checkbox .box .mark {
+    --fx-border-style: solid;
+    --fx-border-color: var(--fx-checkbox-border-color);
+    --fx-border-width: 1px;
+    --fx-border-radius: 3px;
+}
+
+fx-checkbox.pseudo-selected .box .mark {
+    --fx-background-radius: 3px;
+    --fx-background-color: var(--fx-checkbox-background-color);
+}
+
+fx-radiobutton .radio .dot {
+    --fx-border-style: solid;
+    --fx-border-color: var(--fx-radiobutton-border-color);
+    --fx-border-width: 1px;
+    --fx-border-radius: 50%;
+}
+
+fx-radiobutton.pseudo-selected .radio .dot {
+    --fx-background-radius: 50%;
+    --fx-background-color: var(--fx-radiobutton-background-color);
+}
+
+fx-tabheaderarea {
+    --fx-background-color: var(--fx-tabheaderarea-background-color);
+    --fx-border-radius: var(--fx-tabheaderarea-border-radius);
+}
+
+/* Web padding that is read back by WebFX to JavaFX padding */
+fx-tabheaderarea {
+    --fx-padding-top: var(--fx-tabheaderarea-padding-top);
+    --fx-padding-right: var(--fx-tabheaderarea-padding-right);
+    --fx-padding-bottom: var(--fx-tabheaderarea-padding-bottom);
+    --fx-padding-left: var(--fx-tabheaderarea-padding-left);
+}
+
+
+fx-tabheaderskin {
+    --fx-background-color: var(--fx-tabheader-background-color);
+    --fx-border-radius: var(--fx-tabheader-border-radius);
+    --fx-border-style: var(--fx-tabheader-border-style);
+    --fx-border-color: var(--fx-tabheader-border-color);
+    --fx-border-width: var(--fx-tabheader-border-width);
+    --fx-text-fill: var(--fx-tabheader-text-fill);
+    cursor: pointer;
+}
+
+fx-tabheaderskin.selected {
+    --fx-tabheader-background-color: var(--fx-tabheader-background-color-selected);
+    --fx-tabheader-border-width: var(--fx-tabheader-border-width-selected);
+    --fx-text-fill: var(--fx-tabheader-text-fill-selected);
+}
+
+/* Web padding that is read back by WebFX to JavaFX padding */
+fx-tabheaderskin {
+    --fx-padding-top: var(--fx-tabheader-padding-top);
+    --fx-padding-right: var(--fx-tabheader-padding-right);
+    --fx-padding-bottom: var(--fx-tabheader-padding-bottom);
+    --fx-padding-left: var(--fx-tabheader-padding-left);
+}
+
+/*===== webfx-kit-javafxweb-web@main.css from webfx-kit-javafxweb-peers-elemental2 =====*/
+
+iframe {
+    border: none;
+}
+
+/*===== webfx-extras-fonticons-feather-web@main.css from webfx-extras-fonticons-feather =====*/
+
+@font-face {
+    font-family: 'Feather';
+    src: url("./fonts/feather/feather.woff") format("woff");
+    font-weight: 100 900;
+}
+
+.font-feather {
+    font-family: 'Feather';
+}
+/*===== webfx-extras-transitionpane-web@main.css from webfx-extras-panes =====*/
+
+.transition-pane-dual-container {
+    --fx-translate-x: 0;
+
+    transform: translateX(var(--fx-translate-x));
+
+}
+/*===== webfx-extras-controls-web@main.css from webfx-extras-util-control =====*/
+
+:root {
+    --fx-spinner-color: var(--fx-theme-color);
+}
+
+.webfx-extras-spinner {
+    animation: webfx-extras-spinner-rotate 1s linear infinite;
+    --fx-svg-path-fill: var(--fx-spinner-color);
+}
+
+@keyframes webfx-extras-spinner-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/*===== webfx-extras-filepicker-web@main.css from webfx-extras-filepicker-elemental2 =====*/
+
+/* We dont want any background or border for the FilePicker button */
+
+.file-picker fx-button {
+    --fx-background-color: transparent;
+    --fx-border-style: none;
+}
+
+/*===== webfx-extras-ckeditor-web@main.css from webfx-extras-webtext-peers-elemental2 =====*/
+
+/* Applying same user-select setting as fx-text to fx-htmltext */
+fx-htmltext {
+    color: var(--fx-text-fill);
+    -webkit-user-select: var(--text-user-select);
+    -moz-user-select: var(--text-user-select);
+    -ms-user-select: var(--text-user-select);
+    user-select: var(--text-user-select);
+}
+
+/* Hiding the warning message from CKEditor 4.22.1 */
+.cke_notifications_area {
+    display: none;
+}
+/*===== web@main.css from CyclingPower_Web_Local-application =====*/
+
+/***** GWT theme CLEAN *****/
+
+/********* To disable default webfx settings **********/
+:root {
+    --fx-border-color: none;
+    --fx-border-radius: none;
+    --fx-border-style: none;
+    --fx-border-width: none;
+    --fx-border-color-focus: none;
+    --fx-textfield-background: none;
+    -fx-text-fill: none;
+}
+fx-button > fx-background {
+      background: none;
+      border-radius: none;
+}
+/******************************************************/
+
+        /* ========== 17. NEON BORDER ========== */
+        .border-neon {
+           /* border-bottom: 2px solid #00ff00; */
+            box-shadow: 0 -4px 20px rgba(0, 255, 0, 0.7),
+                        inset 0 -1px 3px rgba(0, 255, 0, 0.5),
+                        0 0 20px rgba(0, 255, 0, 0.3);
+        }
+
+        /* ========== 18. METALLIC BORDER ========== */
+        .border-metallic {
+            background:
+                linear-gradient(to right, #e0e0e0, #f5f5f5, #e0e0e0)
+                left bottom no-repeat;
+            background-size: 100% 8px;
+        }
+
+        /* ========== 3D EFFECT BORDER ========== */
+        .border-3d {
+            border-bottom: 4px solid #333;
+            border-right: 4px solid #666;
+            box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+
+.label_icon {
+    color: red;
+    font-size: 48px;
+}
+
+@font-face {
+    font-family: 'FontAwesomeSolid';
+    src: url('/dev/java4now/web/fonts/fa-solid-900.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Feather';
+    src: url('/dev/java4now/web/fonts/feather.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BootstrapIcons';
+    src: url('/dev/java4now/web/fonts/bootstrap-icons.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'CarbonIcons';
+    src: url('/dev/java4now/web/fonts/Carbon-Icons.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Ionicons';
+    src: url('/dev/java4now/web/fonts/ionicons.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.font-ionicons {
+    display: inline-block;
+    font-family: 'Ionicons';
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mora i font-face za svaki font */
+.font-icon-bootstrap {
+    display: inline-block;
+    font-family: 'BootstrapIcons';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-icon-button_fe {
+    display: inline-block;
+    font-family: 'Feather';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+.font-icon-button_fa {
+    display: inline-block;
+    font-family: 'FontAwesomeSolid';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-icon-button {
+    font-size: 32px;
+    color: brown !important;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.font-icon-button:hover {
+   border: 2px solid transparent;
+}
+
+.font-icon-button[disabled]:hover {
+  border: none;
+}
+
+.font-icon-button_big {
+  font-family: 'Feather';
+  font-size: 48px;
+  color: blue;
+  cursor: pointer;
+  background-color: transparent;
+/*    padding: 5px;   */
+}
+
+.font-icon-button_big:hover {
+   border: 2px solid transparent;
+}
+
+.font-chevron-button {
+    font-family: 'Feather';
+    font-size: 64px;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+/*    padding: 5px;   */
+}
+
+/* za kruzni button Za savršen krug, uvek postavite iste vrednosti za width i height i koristite border-radius: 50%. */
+.font-rotate-button {
+    font-size: 48px;
+    color: darkgreen !important;
+    cursor: pointer;
+    background-color: transparent;
+    background-radius: 50%;
+    border-radius: 50%;
+/*    background-color: blue;  */
+}
+
+.font-rotate-button:hover {
+    color: red !important;
+    border: 1px solid transparent;
+}
+
+.font-label {
+    background-color:transparent;
+    color:black;
+    font-family: Verdana, serif;
+/*    font-family: inherit; */
+/*    font-size:18px;     */  /*   font-size: 100%;  */
+    /*
+    3.2vw = 3.2% of width of viewport
+    3.2vh = 3.2% of height of viewport
+    3.2vmin = Smaller of 3.2vw or 3.2vh
+    3.2vmax = Bigger of 3.2vw or 3.2vh
+    */
+    font-size: 2.0vmin;    /* 1.8 */
+/*    font-size: calc(50% + 1vw); */
+/*    font-size: calc(42px + (60 - 42) * (100vw - 768px) / (1440 - 768)); */
+    font-style: normal;
+    font-weight: bold;   /*  font-weight: 900;  */
+}
+
+body {
+    overflow: auto; /* omogucava scroll - po defaultu hidden */
+}
+
+.dialog_button {
+    background-color: rgba(43, 42, 49, 1) !important;
+    border-radius: 8px;
+    font-size: 2vmin;
+    cursor: pointer;
+/*    padding: 0px 7px 0px; */ /* gore desno dole  */
+}
+
+.dialog_button:active {
+     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+
+.my_button {
+    background-color: rgba(204, 255, 204, 1) !important;
+    color: black !important;
+    border:2px solid Wheat;
+    border-radius: 8px;
+    font-size: 2vmin;
+    cursor: pointer;
+/*    padding: 0px 7px 0px; */ /* gore desno dole  */
+}
+
+.my_button:hover {
+  color: black;
+  border:1px solid Grey !important;
+  background-color: rgba(204, 255, 204, 1) !important;
+/*  border-color: #939393; */
+}
+
+/* nema uticaja na html
+ .button:pressed {
+    background-color: Green !important;
+ }
+ */
+.my_button:active {
+     border-width:1;
+     background-color:rgba(204, 255, 204, 1) !important;
+     color:Black;
+     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+
+.my_button[disabled] {
+  cursor: default;
+  color: #888;
+}
+
+.my_button[disabled]:hover {
+  border: 1px outset #ccc;
+}
+
+/*----------------------------------*/
+.label{
+    background-color:transparent;
+    color:black;
+    font-family: Verdana, serif;
+/*    font-family: inherit; */
+/*    font-size:18px;     */  /*   font-size: 100%;  */
+    /*
+    3.2vw = 3.2% of width of viewport
+    3.2vh = 3.2% of height of viewport
+    3.2vmin = Smaller of 3.2vw or 3.2vh
+    3.2vmax = Bigger of 3.2vw or 3.2vh
+    */
+    font-size: 2.4vmin;    /* 1.8 */
+/*    font-size: calc(50% + 1vw); */
+/*    font-size: calc(42px + (60 - 42) * (100vw - 768px) / (1440 - 768)); */
+    font-style: normal;
+    font-weight: bold;   /*  font-weight: 900;  */
+}
+
+/* --------------------- TextField ---------------------*/
+
+fx-textfield {
+   padding: 0px !important;
+   height: 30px !important;
+   left: 0px !important;
+/*   border: 1px solid red;  */
+   border-radius: 10px;
+}
+
+fx-textfield input {
+    font-size: clamp(16px, 4vw, 16px); /* clamp(min, preferred, max) */
+/*    color za text i font mora ovde - paznja za background-color */
+/*
+    color: red;
+    background-color: yellow;
+*/
+/*
+   width: 100% !important;
+   border: none !important;
+   outline: none !important;
+   background-color: transparent !important;
+   padding: 0px !important;
+   margin: 0px !important;
+   */
+}
+
+/* Reset parent fx-textfield focus */
+fx-textfield:focus-within {
+/*    border: 1px solid blue !important;  */
+    border-radius: 10px;
+    box-shadow: none !important;
+}
+
+
+/*
+ .pass-field[type="password"] {
+   color:Black;
+   padding: 0px !important;
+   height: 20 !important;
+   left: 0px !important;
+   outline: none;
+   border: 1px solid #cdcdcd;
+   border-color: rgba(0, 0, 0, .15);
+   background-color: white;
+   font-size: 1.8vmin;
+ }
+*/
+
+input[type=password]{
+   color:Black;
+   padding: 0 px;
+   height: 16 px;
+   position: relative;
+   left: 0;
+   outline: none;
+   border: 1px solid #cdcdcd;
+   background-color: white;
+   font-size: 1.8vmin;
+ }
+
+
+.num_label{
+    background-color:transparent;
+    color:black;
+    font-family: Verdana, serif;
+/*    font-family: inherit; */
+/*    font-size:18px;     */  /*   font-size: 100%;  */
+    /*
+    3.2vw = 3.2% of width of viewport
+    3.2vh = 3.2% of height of viewport
+    3.2vmin = Smaller of 3.2vw or 3.2vh
+    3.2vmax = Bigger of 3.2vw or 3.2vh
+    */
+    font-size: 4.5vmin;    /* 1.8 */
+/*    font-size: calc(50% + 1vw); */
+/*    font-size: calc(42px + (60 - 42) * (100vw - 768px) / (1440 - 768)); */
+    font-style: normal;
+    font-weight: bold;   /*  font-weight: 900;  */
+}
+
+.num_label_right{
+    background-color:transparent;
+    color:black;
+    font-family: Verdana, serif;
+/*    font-family: inherit; */
+/*    font-size:18px;     */  /*   font-size: 100%;  */
+    /*
+    3.2vw = 3.2% of width of viewport
+    3.2vh = 3.2% of height of viewport
+    3.2vmin = Smaller of 3.2vw or 3.2vh
+    3.2vmax = Bigger of 3.2vw or 3.2vh
+    */
+    font-size: 3.9vmin;    /* 1.8 */
+/*    font-size: calc(50% + 1vw); */
+/*    font-size: calc(42px + (60 - 42) * (100vw - 768px) / (1440 - 768)); */
+    font-style: normal;
+    font-weight: bold;   /*  font-weight: 900;  */
+}
+
+/* ------ Label sa grafikom u drugacijoj boji -------*/
+
+.label_graphic{
+    background-color:transparent;
+    font-size: 3.9vmin;    /* 1.8 */
+    font-style: normal;
+    font-weight: bold;   /*  font-weight: 900;  */
+}
+
+/* Mora da bude i .text za color ako labela ima grafiku */
+.label_graphic .text{
+    color:black;
+}
+
+/* Font i color samo za grafiku - trebalo bi da moze isto kao za label uz .graphic-text ali ne radi */
+.label_graphic_ionicons{
+    font-family: 'Ionicons';
+    color:blue;
+}
+
+/*-----------------------------*/
+.simple_list_container {
+    width: 100%; /* Ensure container takes parent width */
+    height: 200px; /* Fixed height for scrolling */
+    overflow-y: auto; /* Ensure scrolling */
+    overflow-x: auto;
+    border: 1px solid #cdcdcd;
+}
+
+.simple_list{
+   background-color: transparent;
+   color: black;
+   font-size: 2vmin;    /* 1.8 */
+   /*    font-size: calc(50% + 1vw); */
+   /*    font-size: calc(42px + (60 - 42) * (100vw - 768px) / (1440 - 768)); */
+    font-style: normal;
+    font-weight: bold;
+    width: 100%; /* Ensure labels take full width */
+    box-sizing: border-box; /* Include padding in width */
+    cursor: pointer;
+}
+
+.simple_list_selected{
+   background-color: #d3d3d3;
+   color: black;
+}
+
+.simple_list:hover {
+  border: 1px outset #ccc;
+}
+
+.pic_scroll{
+  width: 300px;
+  overflow-x: hidden;
+}
+
+/* Style for the icon */
+.list-icon {
+    font-size: 16px;
+    color: blue;
+}
+
+.font-icon-label {
+    background-color:transparent;
+    color:black;
+    font-family: Verdana, serif;
+    font-size: 2.2vmin;    /* 1.8 */
+    font-style: normal;
+    font-weight: normal;   /*  font-weight: 900;  */
+}
+
+.font-icon-label-small {
+    background-color:transparent;
+    color:black;
+    font-family: Verdana, serif;
+    font-size: 1.7vmin;    /* 1.8 */
+    font-style: normal;
+    font-weight: normal;   /*  font-weight: 900;  */
+}
+
+.font-icon-carbon {
+    display: inline-block;
+    font-family: 'CarbonIcons';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.custom-menu-button {
+    background-color: rgba(204, 255, 204, 1) !important;
+    color: black;
+    border:2px solid Wheat;
+    border-radius: 8px;
+    font-size: 2.2vmin;
+/*    padding: 5px 10px; */
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    display: inline-block;  /* Ensures proper width based on content */
+}
+
+.custom-menu-button:hover {
+  color: black;
+  border-width: 1px;
+  background-color: rgba(204, 255, 204, 1) !important;
+  border-color: #939393;
+}
+
+/* Hover preko pane_button-a menja boju caret-a */
+.custom-menu-button:hover .caret_sign {
+    color: red;
+}
+
+.caret_sign {
+    color: blue;
+    transition: color 0.2s ease;
+}
+
+/*----------------------------*/
+.custom-menu-small-button {
+    font-family: 'CarbonIcons';
+    background-color: rgba(204, 255, 204, 1) !important;
+    color: black;
+    border:2px solid Wheat;
+    border-radius: 8px;
+    font-size: 1.6vmin;
+/*    padding: 5px 10px; */
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    display: inline-block;  /* Ensures proper width based on content */
+}
+
+.custom-menu-small-button:hover {
+  color: black;
+  border-width: 1px;
+  background-color: rgba(204, 255, 204, 0.1) !important;
+  border-color: #939393;
+}
+
+/* Hover preko pane_button-a menja boju caret-a */
+.custom-menu-small-button:hover .small_caret_sign {
+    color: red;
+}
+
+.small_caret_sign {
+    color: blue;
+    transition: color 0.2s ease;
+}
+/*---------------------------*/
+
+.custom-menu-item {
+    padding: 0; /* Uklonite padding jer ga sada kontrolišemo kroz container */
+    cursor: pointer;
+    display: block; /* Ensure each item is a block for proper spacing */
+}
+
+.bootstrap-menu-item {
+    display: inline-block;
+    font-family: 'BootstrapIcons';
+    font-size: 1.8vmin;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.feather-menu-item {
+    display: inline-block;
+    font-family: 'Feather';
+    font-size: 1.8vmin;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ------------------------------ */
+.custom-menu-item .label {
+    font-size: 1.8vmin;
+    font-weight: bold;    /* bold utice samo za labelu a ne na text icons */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.custom-menu-item .hbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    min-width: 180px;
+}
+
+.custom-small-menu-item .label {
+    font-family: 'Feather';
+    font-weight: bold;    /* bold utice samo za labelu a ne na text icons */
+    font-size: 1.8vmin;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+/* ------------------ Context menu ------------------ */
+.context-menu {
+  background-color: #ffffff;          /* default = light mode */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 160px;
+  padding: 4px 0;
+  position: absolute;
+  z-index: 1000;
+}
+
+.context-menu .menu-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  user-select: none;
+  background-color: transparent !important;
+}
+
+.context-menu .menu-item:active {
+  background-color: transparent !important;
+}
+
+.context-menu .menu-item:focus {
+  background-color: transparent !important;  /* uklanja default highlight boju */
+  outline: none !important;
+}
+
+.context-menu .menu-item:focus-visible {
+  background-color: transparent !important; /* uklanja default highlight boju */
+  outline: none !important;
+}
+
+.context-menu .text {
+  color: #000000;                     /* default = light mode */
+}
+
+.context-menu .menu-item:hover {
+  background-color: #f0f0f0 !important;  /* zamjena za default highlight boju */
+}
+
+.context-menu-icon {
+  color: FORESTGREEN;                     /* default = light mode */
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .context-menu {
+    background-color: #1e1e1e;        /* tamnije, ali ne potpuno crno */
+    border-color: #444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  .context-menu .text {
+    color: #e0e0e0;                   /* svetlo siva za bolju čitljivost */
+  }
+
+  .context-menu-icon {
+    color: LAWNGREEN;                     /* default = light mode */
+  }
+
+  /* opciono - hover efekat u dark modu */
+  .context-menu .menu-item {
+    background-color: transparent !important;
+  }
+
+  .context-menu .menu-item:hover {
+    background-color: #333 !important;   /* zamjena za default highlight boju */
+  }
+
+  .context-menu .menu-item:active {
+    background-color: transparent !important;
+  }
+}
+
+/*----------------- Slider ---------------*/
+
+.custom-slider {
+  -webkit-appearance: none;
+  width: 50%;
+  height: 4px;
+  background: white;
+  outline: none;
+  border: 3px solid darkgreen;
+  border-radius: 6px;
+}
+
+
+/* for chrome/safari */
+.custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 22px;
+  background: white;
+  cursor: pointer;
+  border: 5px solid brown;
+  border-radius: 4px;
+}
+
+/* for firefox */
+.custom-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: white;
+  cursor: pointer;
+  border: 5px solid brown;
+  border-radius: 4px;
+}
+
+.custom-slider::-webkit-slider-thumb:active {
+/*  border: 2px solid red; */ /* ne radi */
+  height: 100%;
+  border: 6px solid red;
+}
+
+.custom-slider::-moz-range-thumb:active{
+    height: 100%;
+  border: 6px solid red;
+}
+
+.custom-slider::-webkit-slider-thumb:hover {
+  border: 6px solid red;
+}
+
+.custom-slider::-moz-range-thumb:hover {
+  border: 6px solid red;
+}
+
+/*------------- ProgressBar --------------*/
+
+/* Osnovni stil progress bara */
+.custom-progress-bar {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 20px;                    /* visina po želji */
+  width: 100%;
+  border-radius: 12px;             /* zaobljeni krajevi */
+  overflow: hidden;                /* važno za zaobljene krajeve */
+  background: #e0e0e0;             /* pozadina (prazni dio) */
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+  border: none;
+}
+
+/* ════════════════════════════════════
+   CHROME / EDGE / SAFARI
+   ════════════════════════════════════ */
+.custom-progress-bar::-webkit-progress-bar {
+  background: transparent;        /* prozirno da bi se vidjela naša pozadina */
+  border-radius: 12px;
+}
+
+.custom-progress-bar::-webkit-progress-value {
+  /* Glavna zelena boja + glow/gradient */
+  background: linear-gradient(
+    to right,
+    #00ff85 0%,
+    #00cc66 50%,
+    #00b359 100%
+  );
+
+  /* Jači glow efekt */
+  box-shadow:
+    0 0 15px rgba(0, 255, 130, 0.8),
+    0 0 25px rgba(0, 255, 130, 0.5),
+    inset 0 2px 5px rgba(255, 255, 255, 0.4);
+
+  border-radius: 12px;             /* zaobljeni krajevi */
+  transition: width 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Opcionalno – animacija glow-a kad se mijenja */
+.custom-progress-bar.glowing::-webkit-progress-value {
+  animation: glowPulse 2s infinite alternate;
+}
+
+/* ════════════════════════════════════
+   FIREFOX
+   ════════════════════════════════════ */
+.custom-progress-bar::-moz-progress-bar {
+  background: linear-gradient(
+    to right,
+    #00ff85 0%,
+    #00cc66 50%,
+    #00b359 100%
+  );
+
+  border-radius: 12px;
+  box-shadow:
+    0 0 15px rgba(0, 255, 130, 0.8),
+    0 0 25px rgba(0, 255, 130, 0.5);
+}
+
+/* Fallback za starije Firefox verzije koje ne podržavaju box-shadow na ::-moz-progress-bar */
+.custom-progress-bar::-moz-meter-bar {
+  border-radius: 12px;
+}
+
+/* Animacija pulsirajućeg glow-a (možeš dodati klasu .glowing kad želiš efekt) */
+@keyframes glowPulse {
+  0%   { box-shadow: 0 0 15px rgba(0,255,130,0.8), 0 0 25px rgba(0,255,130,0.5); }
+  100% { box-shadow: 0 0 25px rgba(0,255,130,1),   0 0 40px rgba(0,255,130,0.7); }
+}
+
+/*------------- tab pane primena za chart --------------*/
+.tab-pane {
+	background-color: transparent;
+}
+
+.tab-header-area {
+    display: none !important;
+    height: 0px !important;
+    width: 0px !important;
+    min-height: 0px !important;
+    max-height: 0px !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -1000px !important;         /* Ensure it's off-screen */
+    left: -1000px !important;        /* Ensure it's off-screen */
+}
+
+.tab-content-area {
+    border-top: none !important;
+    margin-top: 0px !important;
+    padding: 0px;
+}
+
+/*
+.tab-pane .tab-label {
+    font-size: 1.5vmin;
+	color: black;
+	font-weight: bold;
+	padding: 0 10 0 10;
+}
+
+.tab-pane .headers-region {
+    background-color:blue !important;
+}
+
+.tab-pane .tab-container {
+}
+*/
+
+
+/* Adjust font size for screens < 500px */
+@media screen and (max-width: 500px) {
+
+    fx-textfield {
+        height: 30px !important;
+    }
+
+    fx-textfield input {
+        font-size: clamp(16px, 4vw, 18px); /* clamp(min, preferred, max) */
+    }
+
+    .my_button{
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+
+    .dialog_button{
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+
+    .label{
+        font-size: clamp(16px, 4vw, 18px); /* clamp(min, preferred, max) */
+    }
+
+    .font-icon-label-small{
+        font-size: clamp(14px, 3vw, 16px); /* clamp(min, preferred, max) */
+    }
+
+    .font-icon-label{
+         font-size: clamp(16px, 4vw, 18px); /* clamp(min, preferred, max) */
+    }
+
+    /* Firefox specific - obe metode za maksimalnu kompatibilnost */
+    @supports (-moz-appearance: none) {
+        .font-icon-label{
+             font-size: clamp(14px, 3vw, 16px); /* clamp(min, preferred, max) */
+        }
+    }
+
+    @-moz-document url-prefix() {
+        .font-icon-label{
+             font-size: clamp(14px, 3vw, 16px); /* clamp(min, preferred, max) */
+        }
+    }
+
+    .simple_list {
+        font-size: clamp(16px, 4vw, 18px); /* clamp(min, preferred, max) */
+    }
+
+    .custom-menu-item .label {
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+
+    .custom-small-menu-item .label {
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+
+    .custom-menu-small-button {
+        font-size: clamp(14px, 3vw, 16px); /* Larger base size for small screens */
+    }
+
+    .custom-menu-button {
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+
+    .bootstrap-menu-item {
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+
+    .feather-menu-item {
+        font-size: clamp(16px, 4vw, 18px); /* Larger base size for small screens */
+    }
+}
+
+/* src/main/resources/css/light.css */
+.image-view {
+    transition: filter 0.05s ease, box-shadow 0.05s ease;
+}
+
+.light-0 { filter: brightness(50%); box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.1); }
+.light-1 { filter: brightness(51%); box-shadow: 1px 1px 20px 10px rgba(255, 255, 255, 0.11); }
+.light-2 { filter: brightness(52%); box-shadow: 2px 2px 20px 10px rgba(255, 255, 255, 0.12); }
+.light-3 { filter: brightness(53%); box-shadow: 3px 3px 20px 10px rgba(255, 255, 255, 0.13); }
+.light-4 { filter: brightness(54%); box-shadow: 4px 4px 20px 10px rgba(255, 255, 255, 0.14); }
+.light-5 { filter: brightness(55%); box-shadow: 5px 5px 20px 10px rgba(255, 255, 255, 0.15); }
+.light-6 { filter: brightness(56%); box-shadow: 6px 6px 20px 10px rgba(255, 255, 255, 0.16); }
+.light-7 { filter: brightness(57%); box-shadow: 7px 7px 20px 10px rgba(255, 255, 255, 0.17); }
+.light-8 { filter: brightness(58%); box-shadow: 8px 8px 20px 10px rgba(255, 255, 255, 0.18); }
+.light-9 { filter: brightness(59%); box-shadow: 9px 9px 20px 10px rgba(255, 255, 255, 0.19); }
+.light-10 { filter: brightness(60%); box-shadow: 10px 10px 20px 10px rgba(255, 255, 255, 0.2); }
+.light-11 { filter: brightness(61%); box-shadow: 11px 11px 20px 10px rgba(255, 255, 255, 0.21); }
+.light-12 { filter: brightness(62%); box-shadow: 12px 12px 20px 10px rgba(255, 255, 255, 0.22); }
+.light-13 { filter: brightness(63%); box-shadow: 13px 13px 20px 10px rgba(255, 255, 255, 0.23); }
+.light-14 { filter: brightness(64%); box-shadow: 14px 14px 20px 10px rgba(255, 255, 255, 0.24); }
+.light-15 { filter: brightness(65%); box-shadow: 15px 15px 20px 10px rgba(255, 255, 255, 0.25); }
+.light-16 { filter: brightness(66%); box-shadow: 16px 16px 20px 10px rgba(255, 255, 255, 0.26); }
+.light-17 { filter: brightness(67%); box-shadow: 17px 17px 20px 10px rgba(255, 255, 255, 0.27); }
+.light-18 { filter: brightness(68%); box-shadow: 18px 18px 20px 10px rgba(255, 255, 255, 0.28); }
+.light-19 { filter: brightness(69%); box-shadow: 19px 19px 20px 10px rgba(255, 255, 255, 0.29); }
+.light-20 { filter: brightness(70%); box-shadow: 20px 20px 20px 10px rgba(255, 255, 255, 0.3); }
+.light-21 { filter: brightness(71%); box-shadow: 21px 21px 20px 10px rgba(255, 255, 255, 0.31); }
+.light-22 { filter: brightness(72%); box-shadow: 22px 22px 20px 10px rgba(255, 255, 255, 0.32); }
+.light-23 { filter: brightness(73%); box-shadow: 23px 23px 20px 10px rgba(255, 255, 255, 0.33); }
+.light-24 { filter: brightness(74%); box-shadow: 24px 24px 20px 10px rgba(255, 255, 255, 0.34); }
+.light-25 { filter: brightness(75%); box-shadow: 25px 25px 20px 10px rgba(255, 255, 255, 0.35); }
+.light-26 { filter: brightness(76%); box-shadow: 26px 26px 20px 10px rgba(255, 255, 255, 0.36); }
+.light-27 { filter: brightness(77%); box-shadow: 27px 27px 20px 10px rgba(255, 255, 255, 0.37); }
+.light-28 { filter: brightness(78%); box-shadow: 28px 28px 20px 10px rgba(255, 255, 255, 0.38); }
+.light-29 { filter: brightness(79%); box-shadow: 29px 29px 20px 10px rgba(255, 255, 255, 0.39); }
+.light-30 { filter: brightness(80%); box-shadow: 30px 30px 20px 10px rgba(255, 255, 255, 0.4); }
+.light-31 { filter: brightness(81%); box-shadow: 31px 31px 20px 10px rgba(255, 255, 255, 0.41); }
+.light-32 { filter: brightness(82%); box-shadow: 32px 32px 20px 10px rgba(255, 255, 255, 0.42); }
+.light-33 { filter: brightness(83%); box-shadow: 33px 33px 20px 10px rgba(255, 255, 255, 0.43); }
+.light-34 { filter: brightness(84%); box-shadow: 34px 34px 20px 10px rgba(255, 255, 255, 0.44); }
+.light-35 { filter: brightness(85%); box-shadow: 35px 35px 20px 10px rgba(255, 255, 255, 0.45); }
+.light-36 { filter: brightness(86%); box-shadow: 36px 36px 20px 10px rgba(255, 255, 255, 0.46); }
+.light-37 { filter: brightness(87%); box-shadow: 37px 37px 20px 10px rgba(255, 255, 255, 0.47); }
+.light-38 { filter: brightness(88%); box-shadow: 38px 38px 20px 10px rgba(255, 255, 255, 0.48); }
+.light-39 { filter: brightness(89%); box-shadow: 39px 39px 20px 10px rgba(255, 255, 255, 0.49); }
+.light-40 { filter: brightness(90%); box-shadow: 40px 40px 20px 10px rgba(255, 255, 255, 0.5); }
+.light-41 { filter: brightness(91%); box-shadow: 41px 41px 20px 10px rgba(255, 255, 255, 0.51); }
+.light-42 { filter: brightness(92%); box-shadow: 42px 42px 20px 10px rgba(255, 255, 255, 0.52); }
+.light-43 { filter: brightness(93%); box-shadow: 43px 43px 20px 10px rgba(255, 255, 255, 0.53); }
+.light-44 { filter: brightness(94%); box-shadow: 44px 44px 20px 10px rgba(255, 255, 255, 0.54); }
+.light-45 { filter: brightness(95%); box-shadow: 45px 45px 20px 10px rgba(255, 255, 255, 0.55); }
+.light-46 { filter: brightness(96%); box-shadow: 46px 46px 20px 10px rgba(255, 255, 255, 0.56); }
+.light-47 { filter: brightness(97%); box-shadow: 47px 47px 20px 10px rgba(255, 255, 255, 0.57); }
+.light-48 { filter: brightness(98%); box-shadow: 48px 48px 20px 10px rgba(255, 255, 255, 0.58); }
+.light-49 { filter: brightness(99%); box-shadow: 49px 49px 20px 10px rgba(255, 255, 255, 0.59); }
+.light-50 { filter: brightness(100%); box-shadow: 50px 50px 20px 10px rgba(255, 255, 255, 0.6); }
+.light-51 { filter: brightness(101%); box-shadow: 49px 49px 20px 10px rgba(255, 255, 255, 0.61); }
+.light-52 { filter: brightness(102%); box-shadow: 48px 48px 20px 10px rgba(255, 255, 255, 0.62); }
+.light-53 { filter: brightness(103%); box-shadow: 47px 47px 20px 10px rgba(255, 255, 255, 0.63); }
+.light-54 { filter: brightness(104%); box-shadow: 46px 46px 20px 10px rgba(255, 255, 255, 0.64); }
+.light-55 { filter: brightness(105%); box-shadow: 45px 45px 20px 10px rgba(255, 255, 255, 0.65); }
+.light-56 { filter: brightness(106%); box-shadow: 44px 44px 20px 10px rgba(255, 255, 255, 0.66); }
+.light-57 { filter: brightness(107%); box-shadow: 43px 43px 20px 10px rgba(255, 255, 255, 0.67); }
+.light-58 { filter: brightness(108%); box-shadow: 42px 42px 20px 10px rgba(255, 255, 255, 0.68); }
+.light-59 { filter: brightness(109%); box-shadow: 41px 41px 20px 10px rgba(255, 255, 255, 0.69); }
+.light-60 { filter: brightness(110%); box-shadow: 40px 40px 20px 10px rgba(255, 255, 255, 0.7); }
+.light-61 { filter: brightness(111%); box-shadow: 39px 39px 20px 10px rgba(255, 255, 255, 0.71); }
+.light-62 { filter: brightness(112%); box-shadow: 38px 38px 20px 10px rgba(255, 255, 255, 0.72); }
+.light-63 { filter: brightness(113%); box-shadow: 37px 37px 20px 10px rgba(255, 255, 255, 0.73); }
+.light-64 { filter: brightness(114%); box-shadow: 36px 36px 20px 10px rgba(255, 255, 255, 0.74); }
+.light-65 { filter: brightness(115%); box-shadow: 35px 35px 20px 10px rgba(255, 255, 255, 0.75); }
+.light-66 { filter: brightness(116%); box-shadow: 34px 34px 20px 10px rgba(255, 255, 255, 0.76); }
+.light-67 { filter: brightness(117%); box-shadow: 33px 33px 20px 10px rgba(255, 255, 255, 0.77); }
+.light-68 { filter: brightness(118%); box-shadow: 32px 32px 20px 10px rgba(255, 255, 255, 0.78); }
+.light-69 { filter: brightness(119%); box-shadow: 31px 31px 20px 10px rgba(255, 255, 255, 0.79); }
+.light-70 { filter: brightness(120%); box-shadow: 30px 30px 20px 10px rgba(255, 255, 255, 0.8); }
+.light-71 { filter: brightness(121%); box-shadow: 29px 29px 20px 10px rgba(255, 255, 255, 0.81); }
+.light-72 { filter: brightness(122%); box-shadow: 28px 28px 20px 10px rgba(255, 255, 255, 0.82); }
+.light-73 { filter: brightness(123%); box-shadow: 27px 27px 20px 10px rgba(255, 255, 255, 0.83); }
+.light-74 { filter: brightness(124%); box-shadow: 26px 26px 20px 10px rgba(255, 255, 255, 0.84); }
+.light-75 { filter: brightness(125%); box-shadow: 25px 25px 20px 10px rgba(255, 255, 255, 0.85); }
+.light-76 { filter: brightness(126%); box-shadow: 24px 24px 20px 10px rgba(255, 255, 255, 0.86); }
+.light-77 { filter: brightness(127%); box-shadow: 23px 23px 20px 10px rgba(255, 255, 255, 0.87); }
+.light-78 { filter: brightness(128%); box-shadow: 22px 22px 20px 10px rgba(255, 255, 255, 0.88); }
+.light-79 { filter: brightness(129%); box-shadow: 21px 21px 20px 10px rgba(255, 255, 255, 0.89); }
+.light-80 { filter: brightness(130%); box-shadow: 20px 20px 20px 10px rgba(255, 255, 255, 0.9); }
+.light-81 { filter: brightness(131%); box-shadow: 19px 19px 20px 10px rgba(255, 255, 255, 0.91); }
+.light-82 { filter: brightness(132%); box-shadow: 18px 18px 20px 10px rgba(255, 255, 255, 0.92); }
+.light-83 { filter: brightness(133%); box-shadow: 17px 17px 20px 10px rgba(255, 255, 255, 0.93); }
+.light-84 { filter: brightness(134%); box-shadow: 16px 16px 20px 10px rgba(255, 255, 255, 0.94); }
+.light-85 { filter: brightness(135%); box-shadow: 15px 15px 20px 10px rgba(255, 255, 255, 0.95); }
+.light-86 { filter: brightness(136%); box-shadow: 14px 14px 20px 10px rgba(255, 255, 255, 0.96); }
+.light-87 { filter: brightness(137%); box-shadow: 13px 13px 20px 10px rgba(255, 255, 255, 0.97); }
+.light-88 { filter: brightness(138%); box-shadow: 12px 12px 20px 10px rgba(255, 255, 255, 0.98); }
+.light-89 { filter: brightness(139%); box-shadow: 11px 11px 20px 10px rgba(255, 255, 255, 0.99); }
+.light-90 { filter: brightness(140%); box-shadow: 10px 10px 20px 10px rgba(255, 255, 255, 1.0); }
+.light-91 { filter: brightness(141%); box-shadow: 9px 9px 20px 10px rgba(255, 255, 255, 0.99); }
+.light-92 { filter: brightness(142%); box-shadow: 8px 8px 20px 10px rgba(255, 255, 255, 0.98); }
+.light-93 { filter: brightness(143%); box-shadow: 7px 7px 20px 10px rgba(255, 255, 255, 0.97); }
+.light-94 { filter: brightness(144%); box-shadow: 6px 6px 20px 10px rgba(255, 255, 255, 0.96); }
+.light-95 { filter: brightness(145%); box-shadow: 5px 5px 20px 10px rgba(255, 255, 255, 0.95); }
+.light-96 { filter: brightness(146%); box-shadow: 4px 4px 20px 10px rgba(255, 255, 255, 0.94); }
+.light-97 { filter: brightness(147%); box-shadow: 3px 3px 20px 10px rgba(255, 255, 255, 0.93); }
+.light-98 { filter: brightness(148%); box-shadow: 2px 2px 20px 10px rgba(255, 255, 255, 0.92); }
+.light-99 { filter: brightness(149%); box-shadow: 1px 1px 20px 10px rgba(255, 255, 255, 0.91); }

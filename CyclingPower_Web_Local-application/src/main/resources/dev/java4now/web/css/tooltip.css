@@ -1,0 +1,215 @@
+/*-------- TOOLTIP --------*/
+/* custom-tooltip.css */
+.custom-tooltip {
+    /* CSS reset i osnovni stilovi */
+    all: initial;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.tooltip-container {
+    /* Box model */
+    box-sizing: border-box;
+    display: inline-block;
+    max-width: 300px;
+    min-width: 50px;
+
+    /* Pozadina i border */
+    background-color: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+
+    /* Padding i margine */
+    padding: 6px 10px;
+    margin: 0;
+
+    /* Tekst */
+    color: white;
+    font-size: 12px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-weight: normal;
+    line-height: 1.4;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+
+    /* Shadow efekat */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+}
+
+/* Stilovi za tekst unutar tooltip-a */
+.tooltip-text {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+/* Stanje kada je tooltip vidljiv */
+.tooltip-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Dark theme varijanta */
+.dark .tooltip-container {
+    background-color: rgba(30, 30, 30, 0.97);
+    border-color: rgba(100, 100, 100, 0.3);
+    color: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Light theme varijanta */
+.light .tooltip-container {
+    background-color: rgba(250, 250, 250, 0.97);
+    border-color: rgba(200, 200, 200, 0.8);
+    color: #333333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Stilovi za strelicu (arrow) - opcionalno */
+.tooltip-container.with-arrow {
+    position: relative;
+}
+
+.tooltip-container.with-arrow::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(50, 50, 50, 0.95) transparent transparent transparent;
+}
+
+.dark .tooltip-container.with-arrow::after {
+    border-color: rgba(30, 30, 30, 0.97) transparent transparent transparent;
+}
+
+.light .tooltip-container.with-arrow::after {
+    border-color: rgba(250, 250, 250, 0.97) transparent transparent transparent;
+}
+
+/* Pravci strelica */
+.tooltip-container.arrow-top::after {
+    top: 100%;
+    left: 50%;
+    border-color: rgba(50, 50, 50, 0.95) transparent transparent transparent;
+}
+
+.tooltip-container.arrow-bottom::after {
+    top: -12px;
+    left: 50%;
+    border-color: transparent transparent rgba(50, 50, 50, 0.95) transparent;
+}
+
+.tooltip-container.arrow-left::after {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border-color: transparent transparent transparent rgba(50, 50, 50, 0.95);
+}
+
+.tooltip-container.arrow-right::after {
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
+    border-color: transparent rgba(50, 50, 50, 0.95) transparent transparent;
+}
+
+/* Veličine tooltip-a */
+.tooltip-container.small {
+    font-size: 11px;
+    padding: 4px 8px;
+    max-width: 200px;
+}
+
+.tooltip-container.medium {
+    font-size: 13px;
+    padding: 8px 12px;
+    max-width: 250px;
+}
+
+.tooltip-container.large {
+    font-size: 14px;
+    padding: 10px 16px;
+    max-width: 400px;
+}
+
+/* Boje za različite tipove poruka */
+.tooltip-container.info {
+    background-color: rgba(33, 150, 243, 0.95);
+    border-color: rgba(100, 181, 246, 0.8);
+}
+
+.tooltip-container.success {
+    background-color: rgba(76, 175, 80, 0.95);
+    border-color: rgba(129, 199, 132, 0.8);
+}
+
+.tooltip-container.warning {
+    background-color: rgba(255, 152, 0, 0.95);
+    border-color: rgba(255, 183, 77, 0.8);
+    color: #333;
+}
+
+.tooltip-container.error {
+    background-color: rgba(244, 67, 54, 0.95);
+    border-color: rgba(239, 154, 154, 0.8);
+}
+
+/* Animacije za pojavljivanje */
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes tooltipFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.tooltip-container.animate-fade-in {
+    animation: tooltipFadeIn 0.2s ease-out forwards;
+}
+
+.tooltip-container.animate-fade-out {
+    animation: tooltipFadeOut 0.2s ease-in forwards;
+}
+
+/* Responsive pristup */
+@media (max-width: 768px) {
+    .tooltip-container {
+        font-size: 11px;
+        padding: 4px 8px;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tooltip-container {
+        font-size: 10px;
+        padding: 3px 6px;
+        max-width: 150px;
+    }
+}

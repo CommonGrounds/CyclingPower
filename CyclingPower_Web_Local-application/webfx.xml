@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project requiresTimezoneData="true">
+
+    <exported-packages>
+        <source-packages/>
+        <resource-packages/>
+    </exported-packages>
+
+    <dependencies>
+        <used-by-source-modules/>
+    </dependencies>
+
+    <providers>
+        <provider interface="javafx.application.Application">dev.java4now.web.CyclingPower_Web_Local</provider>
+        <provider interface="dev.webfx.stack.com.serial.spi.SerialCodec">dev.java4now.web.pojo.UserSerialCodec</provider>
+    </providers>
+
+</project>
