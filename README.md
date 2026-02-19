@@ -22,7 +22,7 @@ The most unique aspect of this project is that it is built using **[WebFX](https
 
 WebFX is a revolutionary toolchain that allows developers to:
 
-* **Reuse JavaFX Code:** Use the same UI logic and components from the mobile application.
+* **Use JavaFX Code:** For UI logic and components ( Minor Java Script usage for IndexDB ).
 * **GWT Compilation:** Leverages the GWT (Google Web Toolkit) compiler to turn Java code into standard JavaScript.
 * **No Plugins:** No Java plugin or WebAssembly required; it runs natively in the browser's DOM.
 * **High Performance:** Smooth animations and responsive charts, all managed through Java's robust type system.
