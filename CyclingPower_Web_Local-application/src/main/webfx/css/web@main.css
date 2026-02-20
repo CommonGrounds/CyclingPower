@@ -14,6 +14,16 @@ fx-button > fx-background {
       background: none;
       border-radius: none;
 }
+
+fx-button {
+    --fx-background-color: none;
+    --fx-border-style: none;
+    --fx-border-color: none;
+    --fx-border-width: none;
+    --fx-border-radius: none;
+    --text-user-select: none;
+}
+
 /******************************************************/
 
         /* ========== 17. NEON BORDER ========== */
@@ -158,6 +168,16 @@ fx-button > fx-background {
     font-weight: bold;
     background-color: rgba(0, 0, 0, 0.4) !important;
 /*    padding: 5px;   */
+}
+
+.name_btn {
+    color: #8A2BE2;
+    cursor: pointer;
+ }
+
+.name_btn:hover {
+   color:#53148e;
+   border: 1px solid transparent;
 }
 
 /* za kruzni button Za savršen krug, uvek postavite iste vrednosti za width i height i koristite border-radius: 50%. */

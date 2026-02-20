@@ -29,7 +29,6 @@ import dev.webfx.platform.fetch.Fetch;
 import dev.webfx.platform.ast.json.Json;
 import dev.webfx.platform.console.Console;
 import dev.webfx.platform.resource.Resource;
-import dev.webfx.platform.useragent.UserAgent;
 import dev.webfx.platform.windowlocation.WindowLocation;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -38,7 +37,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane; // IMPORTANT - mora explicite za scrollPane
@@ -97,7 +95,7 @@ public class CyclingPower_Web_Local extends Application {
 
     //--------- Left Pane Controls --------------
     public static Label name_lbl;
-    public static Label name_lbl2;
+    public static HBox name_group;
     public static Label server_lbl;
     public static Label path_lbl;
     //--------- Up Pane Controls --------------
@@ -190,9 +188,24 @@ public class CyclingPower_Web_Local extends Application {
 
         //--------- Left Pane Controls --------------
         name_lbl = new Label("log Name");
-        name_lbl2 = new Label();
-        name_lbl2.setTextFill(Color.BLUEVIOLET);
-        name_lbl2.textProperty().bind(name_txt);
+        var name_lbl_2 = new Label();
+        name_lbl_2.setTextFill(Color.BLUEVIOLET);
+        name_lbl_2.textProperty().bind(name_txt);
+        String nameIconChar = Feather_Icons.getChar("REFRESH_CW");
+        var name_btn = new Text(nameIconChar);
+        name_btn.setFont(font);
+        name_btn.getStyleClass().addAll("font-icon-button_fe", "name_btn");
+        name_btn.setOnMouseEntered( e -> TooltipHelper.showQuickTooltip(name_btn,"Change name", CustomTooltip.TooltipPosition.RIGHT));
+        name_btn.setOnMouseClicked(e -> {
+            // Custom dialog setup
+            CustomDialog dialog = new CustomDialog("Change name", input -> {
+                Console.log("Dialog result: " + input.toString());
+                WindowLocation.assignHref(WindowLocation.getHref()); // important - reload
+            });
+            dialog.show(uber_root);
+        });
+        name_group = new HBox(10,name_btn,name_lbl_2);
+        name_group.setAlignment(Pos.CENTER);
         server_lbl = new Label();
         server_lbl.textProperty().bind(server_txt);
         path_lbl = new Label();
@@ -324,9 +337,9 @@ public class CyclingPower_Web_Local extends Application {
                             index = right_pane.getChildren().indexOf(name_lbl);
                             right_pane.getChildren().remove(index);
                             right_pane.getChildren().add(index, name_lbl);
-                            index = right_pane.getChildren().indexOf(name_lbl2);
+                            index = right_pane.getChildren().indexOf(name_group);
                             right_pane.getChildren().remove(index);
-                            right_pane.getChildren().add(index, name_lbl2);
+                            right_pane.getChildren().add(index, name_group);
 //                            if (right_pane.getChildren().contains(bar_chart)){
                             index = right_pane.getChildren().indexOf(bar_chart);
                             right_pane.getChildren().remove(index);

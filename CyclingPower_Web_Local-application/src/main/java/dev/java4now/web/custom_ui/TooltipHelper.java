@@ -154,7 +154,7 @@ public class TooltipHelper {
     }
 
     // Simple method for quick tooltips
-    public static void showQuickTooltip(Node node, String text) {
+    public static void showQuickTooltip(Node node, String text, CustomTooltip.TooltipPosition position) {
         CustomTooltip tooltip = new CustomTooltip(text);
 
         // Add to scene if possible
@@ -169,12 +169,13 @@ public class TooltipHelper {
             double y = node.getLayoutY();
             Bounds bounds = node.getBoundsInLocal();
 
-            tooltip.showAt(x + bounds.getWidth() + 5, y);
+//            tooltip.showAt(x + bounds.getWidth() + 5, y);
+            tooltip.showForNode(node, position);
 
             // Auto-hide after 3 seconds
             // Kratak delay pre sakrivanja
             var pause = new javafx.animation.PauseTransition();
-            pause.setDuration(javafx.util.Duration.millis(3000));
+            pause.setDuration(javafx.util.Duration.millis(1500));
             pause.setOnFinished(e -> {
                 tooltip.hide();
                 root.getChildren().remove(tooltip);

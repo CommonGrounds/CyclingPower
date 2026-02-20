@@ -97,7 +97,7 @@ public class RightPane {
                 lbl_cad,
                 lbl_cad2,
                 PIE_CHART_IS_HERE ? name_lbl : null,
-                PIE_CHART_IS_HERE ? name_lbl2 : null,
+                PIE_CHART_IS_HERE ? name_group : null,
                 PIE_CHART_IS_HERE ? bar_chart : null,
                 PASTAFARIAN_IS_HERE ? pastafarian : null
         ).stream().filter(node -> node != null).collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class RightPane {
 //            VBox.setMargin(lbl_time, new Insets(20, 0, 0, 0));
             MovingChart.resize(right_pane.getWidth() );
             VBox.setMargin(name_lbl, new Insets(20, 0, 0, 0)); // log
-            VBox.setMargin(name_lbl2, new Insets(0, 0, 0, 0)); // log
+            VBox.setMargin(name_group, new Insets(0, 0, 0, 0)); // log
             VBox.setMargin(server_lbl, new Insets(10, 0, 0, 0)); // 0
             VBox.setMargin(path_lbl, new Insets(0, 0, 0, 0));    // 1
             VBox.setMargin(bar_chart, new Insets(0, 0, 0, 0)); // zbog pastafarian btn ali ne treba ( bottom 0 )

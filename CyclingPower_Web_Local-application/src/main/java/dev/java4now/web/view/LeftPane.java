@@ -4,7 +4,6 @@ import dev.java4now.web.CyclingPower_Web_Local;
 import dev.java4now.web.charts.MovingChart;
 import dev.java4now.web.charts.SummaryChart;
 import dev.java4now.web.custom_ui.CustomTooltip;
-import dev.java4now.web.custom_ui.TooltipHelper;
 import dev.java4now.web.icons.Feather_Icons;
 import dev.webfx.platform.os.OperatingSystem;
 import dev.webfx.platform.resource.Resource;
@@ -148,7 +147,7 @@ public class LeftPane {
                 menu_btn ,
                 menuTooltip ,
                 PIE_CHART_IS_HERE ? name_lbl : null,
-                PIE_CHART_IS_HERE ? name_lbl2 : null,
+                PIE_CHART_IS_HERE ? name_group : null,
                 PIE_CHART_IS_HERE ? server_lbl : null,
                 PIE_CHART_IS_HERE ? path_lbl : null,
                 PIE_CHART_IS_HERE ? pie_chart : null,
@@ -186,7 +185,7 @@ public class LeftPane {
 
         if(PIE_CHART_IS_HERE) {
             VBox.setMargin(menu_btn, new Insets(10, 0, 10, 0));
-            VBox.setMargin(name_lbl2, new Insets(0, 0, 30, 0));
+            VBox.setMargin(name_group, new Insets(0, 0, 30, 0));
             VBox.setMargin(server_lbl, new Insets(0, 0, 0, 0));
             VBox.setMargin(path_lbl, new Insets(0, 0, 30, 0));
             VBox.setMargin(pie_chart, new Insets(20, 0, 0, 0));
