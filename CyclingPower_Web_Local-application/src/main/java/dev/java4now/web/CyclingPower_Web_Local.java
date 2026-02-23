@@ -11,6 +11,7 @@ import dev.java4now.web.graph.CanvasChartPane;
 import dev.java4now.web.graph.ProgressPane;
 import dev.java4now.web.http.IPCodes;
 import dev.java4now.web.http.SimpleBase64;
+import dev.java4now.web.icons.Bootstrap_Icons;
 import dev.java4now.web.icons.Feather_Icons;
 import dev.java4now.web.icons.FontAwesomeSolid_Icons;
 import dev.java4now.web.icons.Ionicons;
@@ -58,6 +59,7 @@ import service.Service_impl;
 import java.util.Optional;
 
 import static dev.java4now.web.Settings.name_txt;
+import static dev.java4now.web.graph.CanvasChartPane.bootstrap_font;
 import static dev.java4now.web.util.Helper_light.formatTimestamp;
 import static dev.java4now.web.view.LeftPane.*;
 import static dev.java4now.web.view.UpPane.fetch_all_btn;
@@ -67,7 +69,7 @@ import static dev.java4now.web.websocket.WebSocketClient.startWebSocket;
 public class CyclingPower_Web_Local extends Application {
 
 //##############################################################
-    public static boolean PRODUCTION = true;
+    public static boolean PRODUCTION = false;
 //##############################################################
 
     public static String BASE_URL = "http://localhost:8080";                                        // local - 8080 sa clone serverom , 8880 sa orig
@@ -99,7 +101,7 @@ public class CyclingPower_Web_Local extends Application {
     public static Label server_lbl;
     public static Label path_lbl;
     //--------- Up Pane Controls --------------
-    public static Button pastafarian;
+    public static Button gnu_btn;
     //-----------------------------------------
 
     public static final BooleanProperty IS_TOTAL_TIME = new SimpleBooleanProperty(false);
@@ -211,17 +213,17 @@ public class CyclingPower_Web_Local extends Application {
         path_lbl = new Label();
         path_lbl.textProperty().bind(path_txt);
         //--------- Up Pane Controls --------------
-        String menuIconChar = FontAwesomeSolid_Icons.getIcon("PASTAFARIANISM");
-        pastafarian = new Button(menuIconChar);
-        pastafarian.setTextFill(Color.BLUEVIOLET);
-        pastafarian.setFont(font_fa);                             // font_fa
-        pastafarian.getStyleClass().addAll("font-icon-button_fa", "font-icon-button");   // font-icon-button_fa za FontAwesomeSolid ikone
-        String pastafarian_url = "https://www.spaghettimonster.org";
-        pastafarian.setOnAction(e -> {
+        String menuIconChar = Bootstrap_Icons.getIcon("GITHUB");
+        gnu_btn = new Button(menuIconChar);
+        gnu_btn.setTextFill(Color.BLUEVIOLET);
+        gnu_btn.setFont(bootstrap_font);                             // font_fa
+        gnu_btn.getStyleClass().addAll("font-icon-bootstrap", "font-icon-button");   // font-icon-button_fa za FontAwesomeSolid ikone
+        String gnu_url = "https://github.com/CommonGrounds/CyclingPower";
+        gnu_btn.setOnAction(e -> {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    getHostServices().showDocument(pastafarian_url);
+                    getHostServices().showDocument(gnu_url);
                 }
             });
         });
@@ -360,10 +362,10 @@ public class CyclingPower_Web_Local extends Application {
                             bar_chart.setAlignment(Pos.CENTER);
                             bar_chart.setPadding(new Insets(0, 0, 0, screen_width < 500 ? 30 : 40)); // left korekcija ako nije 1. el.
 //                            }
-                            if (right_pane.getChildren().contains(pastafarian)) {
-                                index = right_pane.getChildren().indexOf(pastafarian);
+                            if (right_pane.getChildren().contains(gnu_btn)) {
+                                index = right_pane.getChildren().indexOf(gnu_btn);
                                 right_pane.getChildren().remove(index);
-                                right_pane.getChildren().add(index, pastafarian); // last
+                                right_pane.getChildren().add(index, gnu_btn); // last
                             }
                         }
                     }
@@ -477,8 +479,8 @@ public class CyclingPower_Web_Local extends Application {
                 );
 
 
-                // Koristi TooltipHelper
-                TooltipHelper.attachTooltip(pastafarian, "Go to\nSpaghetti Monster",
+                // Koristi TooltipHelper - important nowrap white-space: nowrap;
+                TooltipHelper.attachTooltip(gnu_btn, "May the <br><span style='white-space: nowrap;'><b>Source</b> be with <b>You</b></span>",   // Go to \nSpaghetti Monster
                         CustomTooltip.TooltipPosition.LEFT,
                         CustomTooltip.TooltipType.DEFAULT,
                          true);

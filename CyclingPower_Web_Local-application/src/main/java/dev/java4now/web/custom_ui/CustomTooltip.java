@@ -7,7 +7,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
+import dev.webfx.extras.webtext.HtmlText;
 import javafx.util.Duration;
 
 public class CustomTooltip extends Control {
@@ -189,12 +189,12 @@ public class CustomTooltip extends Control {
     // Skin klasa
     private static class CustomTooltipSkin extends SkinBase<CustomTooltip> {
         private final StackPane container;
-        private final Text textNode;
+        private final HtmlText textNode;
 
         protected CustomTooltipSkin(CustomTooltip control) {
             super(control);
 
-            textNode = new Text(control.text);
+            textNode = new HtmlText(control.text);
             textNode.getStyleClass().add("tooltip-text");
 
             container = new StackPane(textNode);

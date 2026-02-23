@@ -13,8 +13,11 @@
     /* Box model */
     box-sizing: border-box;
     display: inline-block;
-    max-width: 300px;
-    min-width: 50px;
+
+    /* KLJUČNE IZMENE ZA AUTOMATSKU ŠIRINU: */
+    width: max-content;       /* Širi se tačno onoliko koliko mu treba za najduži red */
+    max-width: 300px;         /* Ipak ograničavamo da ne ode preko celog ekrana */
+    min-width: auto;          /* Dozvoljavamo mu da bude mali ako je tekst kratak */
 
     /* Pozadina i border */
     background-color: rgba(50, 50, 50, 0.95);
@@ -37,7 +40,6 @@
 
     /* Shadow efekat */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-
 }
 
 /* Stilovi za tekst unutar tooltip-a */

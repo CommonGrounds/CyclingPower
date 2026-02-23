@@ -224,7 +224,7 @@ public class UpPane {
 
         Pane pane = new Pane(Arrays.asList(
                 lbl_device, lbl_device2, fetch_all_btn, datum_box, jsonFileListView, scroll_Pane,
-                PASTAFARIAN_IS_HERE ? pastafarian : null
+                PASTAFARIAN_IS_HERE ? gnu_btn : null
         ).stream().filter(Objects::nonNull).toArray(Node[]::new)){
             @Override
             protected void layoutChildren() {
@@ -243,12 +243,12 @@ public class UpPane {
                 Console.log("Width: " + CyclingPower_Web_Local.screen_width + ", Height: " + CyclingPower_Web_Local.screen_height);
                 // laptop - Width: 1366, Height: 573
                 if (screen_width > 800 && screen_width < 900 && PASTAFARIAN_IS_HERE) {
-                    pastafarian.setLayoutX(getWidth()/2 - pastafarian.getWidth()/2);
-                    pastafarian.setLayoutY(10);
+                    gnu_btn.setLayoutX(getWidth()/2 - gnu_btn.getWidth()/2);
+                    gnu_btn.setLayoutY(10);
                 }else{
                     if (PASTAFARIAN_IS_HERE) {
-                        pastafarian.setLayoutX(getWidth() - pastafarian.getWidth() - 5);
-                        pastafarian.setLayoutY(10);
+                        gnu_btn.setLayoutX(getWidth() - gnu_btn.getWidth() - 5);
+                        gnu_btn.setLayoutY(10);
                     }
                 }
                 if(screen_width < 900 ){

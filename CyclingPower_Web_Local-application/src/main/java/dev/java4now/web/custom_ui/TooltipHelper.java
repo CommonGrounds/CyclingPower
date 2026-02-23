@@ -82,9 +82,9 @@ public class TooltipHelper {
             var pause = new javafx.animation.PauseTransition();
             pause.setDuration(javafx.util.Duration.millis(100));
             pause.setOnFinished(ev -> {
-                if (!isMouseOverTooltipOrNode(tooltip, node)) {
+//                if (!isMouseOverTooltipOrNode(tooltip, node)) {
                     tooltip.hide();
-                }
+//                }
             });
             pause.play();
         });

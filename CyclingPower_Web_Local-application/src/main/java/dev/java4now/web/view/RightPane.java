@@ -99,7 +99,7 @@ public class RightPane {
                 PIE_CHART_IS_HERE ? name_lbl : null,
                 PIE_CHART_IS_HERE ? name_group : null,
                 PIE_CHART_IS_HERE ? bar_chart : null,
-                PASTAFARIAN_IS_HERE ? pastafarian : null
+                PASTAFARIAN_IS_HERE ? gnu_btn : null
         ).stream().filter(node -> node != null).collect(Collectors.toList());
 
 //        Console.log("PieChart: " + (pie_chart != null) + " ");
