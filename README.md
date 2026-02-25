@@ -29,7 +29,7 @@ WebFX is a revolutionary toolchain that allows developers to:
 
 ---
 
-## 🚀 Key Features
+## 🚴🏼 Key Features
 
 * **Data Visualization:** Beautiful, interactive charts showing speed, cadence, and power metrics.
 * **FIT to JSON Analysis:** Seamless integration with the Spring Boot backend to process and display standard cycling `.fit` files.
