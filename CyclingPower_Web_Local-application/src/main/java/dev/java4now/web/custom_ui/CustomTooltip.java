@@ -8,6 +8,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
 import dev.webfx.extras.webtext.HtmlText;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class CustomTooltip extends Control {
@@ -18,6 +19,8 @@ public class CustomTooltip extends Control {
     private boolean showArrow = false;
     private double offsetX = 0;
     private double offsetY = 0;
+    private static Font font;
+    private static String style;
 
     // Za tracking pozicije
     private double targetX = 0;
@@ -37,6 +40,8 @@ public class CustomTooltip extends Control {
 
     public CustomTooltip(String text) {
         this.text = text;
+        font = Font.getDefault();
+        style = "";
         getStyleClass().add("custom-tooltip");
         setVisible(false);
         setManaged(false);
@@ -55,6 +60,17 @@ public class CustomTooltip extends Control {
         this.text = text;
         if (getSkin() != null) {
             ((CustomTooltipSkin) getSkin()).updateText(text);
+        }
+    }
+
+    public void setFont(Font custom_font) {
+        font = custom_font;
+    }
+
+    public void setFontStyle(String custom_style){
+        style = custom_style;
+        if (getSkin() != null) {
+            ((CustomTooltipSkin) getSkin()).updateStyleClasses();
         }
     }
 
@@ -220,6 +236,10 @@ public class CustomTooltip extends Control {
 
             container.getStyleClass().add(getSkinnable().type.name().toLowerCase());
             container.getStyleClass().add(getSkinnable().size.name().toLowerCase());
+            if(!style.isEmpty()){
+                textNode.setFont(font);
+                textNode.getStyleClass().add(style);
+            }
 
             if (getSkinnable().showArrow) {
                 container.getStyleClass().add("with-arrow");

@@ -197,6 +197,7 @@ public class CyclingPower_Web_Local extends Application {
         var name_btn = new Text(nameIconChar);
         name_btn.setFont(font);
         name_btn.getStyleClass().addAll("font-icon-button_fe", "name_btn");
+        // "<font color=\"red\">Change</font> \uD83D\uDEB4\uD83C\uDFFC name"
         name_btn.setOnMouseEntered( e -> TooltipHelper.showQuickTooltip(name_btn,"Change name", CustomTooltip.TooltipPosition.RIGHT));
         name_btn.setOnMouseClicked(e -> {
             // Custom dialog setup

@@ -65,8 +65,10 @@ public class LeftPane {
         menu_btn.setFont(font);                             // font_fa za FontAwesomeSolid ikone
         menu_btn.getStyleClass().addAll("font-icon-button_fe","font-icon-button");  // font-icon-button_fa za FontAwesomeSolid ikone
 //        Console.log("font: " + btn.getFont().getFamily());
-        CustomTooltip menuTooltip = new CustomTooltip("Expand menu");
+        CustomTooltip menuTooltip = new CustomTooltip(/*"💔" + */"Expand menu"); // important mora da se doda kao node u parent
 //        menuTooltip.setShowArrow(true);
+//        menuTooltip.setFont(font);
+//        menuTooltip.setFontStyle("font-icon-button_fe");
         menuTooltip.setPosition(CustomTooltip.TooltipPosition.RIGHT);
         menu_btn.setOnMouseEntered(event -> {
 //            TooltipHelper.showQuickTooltip(menu_btn,"Expand menu");

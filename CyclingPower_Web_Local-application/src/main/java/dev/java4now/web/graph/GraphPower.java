@@ -151,7 +151,7 @@ public class GraphPower {
         context1.setFill(Color.rgb(100, 2, 2)); // green
         context1.fill();
         // Black rectangle ako je mobile ( 1080 je minimum da se brojevi 2 decimale jasno vide levo inace mora desno - 1800 px za ceo screen width )
-        if (width < 760) {
+        if (width < 1080) {
             context1.setGlobalAlpha(0.5);
             context1.setFill(Color.rgb(0, 0, 0)); // black
             context1.fillRect(start_position_x + 2, 0, 60,start_position_y );
@@ -159,20 +159,21 @@ public class GraphPower {
         context1.restore(); // vraca na staro ne treba context1.setGlobalAlpha(1);
 
         // horizontale po y osi
-        if (width < 760) {
+        if (width < 1080) {
             context1.setTextAlign(TextAlignment.LEFT);
         } else {
             context1.setTextAlign(TextAlignment.RIGHT);
         }
-        double step_alt = max_alt_tmp / 4;
+        double max_pwr_tmp =  max_power   * 0.82;
+        double step_pwr = max_pwr_tmp / 4;
         for (int i = 1; i < 5; i++) {
             double current_pos = start_position_y - (step_horizontale * i);
             if(i == 4){
-                txt = Format.formatDouble_GWT((step_alt * i)*1,0) + " m";
+                txt = Format.formatDouble_GWT((step_pwr * i)*1,0) + " W";
             }else{
-                txt = Format.formatDouble_GWT((step_alt * i),0) + " m";
+                txt = Format.formatDouble_GWT((step_pwr * i),0) + " W";
             }
-            if (width < 760) {
+            if (width < 1080) {
                 context1.setFill(Color.rgb(255, 255, 255) ); // bela
                 context1.fillText(txt, start_position_x + 5, current_pos + font.getSize() / 2);
             } else {
