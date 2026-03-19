@@ -481,7 +481,7 @@ public class CyclingPower_Web_Local extends Application {
 
 
                 // Koristi TooltipHelper - important nowrap white-space: nowrap;
-                TooltipHelper.attachTooltip(gnu_btn, "May the <br><span style='white-space: nowrap;'><b>Source</b> be with <b>You</b></span>",   // Go to \nSpaghetti Monster
+                TooltipHelper.attachTooltip(gnu_btn, "⚡ May the <br><span style='white-space: nowrap;'><b>Source</b> be with <b>You</b></span>",   // Go to \nSpaghetti Monster
                         CustomTooltip.TooltipPosition.LEFT,
                         CustomTooltip.TooltipType.DEFAULT,
                          true);
