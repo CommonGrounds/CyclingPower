@@ -42,6 +42,14 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
+.html {
+      /* Ponistavamo sve CSS resete i osnovne stilove postavljene u .tooltip-container */
+      background-color: transparent !important;
+      border: none !important;
+      border-radius: none !important;
+      box-shadow: none !important;
+}
+
 /* Stilovi za tekst unutar tooltip-a */
 .tooltip-text {
     color: inherit;

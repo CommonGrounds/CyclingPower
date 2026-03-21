@@ -1,15 +1,18 @@
 package dev.java4now.web.custom_ui;
 
+import dev.webfx.extras.webtext.HtmlText;
 import dev.webfx.platform.console.Console;
-import javafx.animation.PauseTransition;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
-import dev.webfx.extras.webtext.HtmlText;
-import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.scene.layout.Pane;
 
 public class CustomTooltip extends Control {
     private String text;
@@ -19,15 +22,14 @@ public class CustomTooltip extends Control {
     private boolean showArrow = false;
     private double offsetX = 0;
     private double offsetY = 0;
-    private static Font font;
-    private static String style;
+    public boolean isHtml = false;
 
     // Za tracking pozicije
     private double targetX = 0;
     private double targetY = 0;
 
     public enum TooltipPosition {
-        TOP, BOTTOM, LEFT, RIGHT
+        UP_LEFT,TOP, BOTTOM, LEFT, RIGHT
     }
 
     public enum TooltipType {
@@ -40,12 +42,20 @@ public class CustomTooltip extends Control {
 
     public CustomTooltip(String text) {
         this.text = text;
-        font = Font.getDefault();
-        style = "";
+        this.isHtml = false;
         getStyleClass().add("custom-tooltip");
         setVisible(false);
         setManaged(false);
     }
+
+    public CustomTooltip(String text,boolean is_html) {
+        this.text = text;
+        this.isHtml = is_html;
+        getStyleClass().add("custom-tooltip");
+        setVisible(false);
+        setManaged(false);
+    }
+
 
     public CustomTooltip() {
         this("");
@@ -60,17 +70,6 @@ public class CustomTooltip extends Control {
         this.text = text;
         if (getSkin() != null) {
             ((CustomTooltipSkin) getSkin()).updateText(text);
-        }
-    }
-
-    public void setFont(Font custom_font) {
-        font = custom_font;
-    }
-
-    public void setFontStyle(String custom_style){
-        style = custom_style;
-        if (getSkin() != null) {
-            ((CustomTooltipSkin) getSkin()).updateStyleClasses();
         }
     }
 
@@ -117,6 +116,7 @@ public class CustomTooltip extends Control {
         setVisible(true);
         toFront(); // Uvek na vrh
         if (getSkin() != null) {
+//            Console.log("show skin");
             ((CustomTooltipSkin) getSkin()).show();
         }
     }
@@ -164,6 +164,11 @@ public class CustomTooltip extends Control {
         double x = 0, y = 0;
 
         switch (position) {
+            case UP_LEFT:
+                Console.log("skin container width: " + ((CustomTooltipSkin) getSkin()).container.prefWidth(-1));
+                x = nodeX  - nodeWidth - 5;
+                y = nodeY - 20;
+                break;
             case TOP:
                 x = nodeX; // + nodeWidth / 2; // important - direktno iznad
                 y = nodeY - 5;
@@ -173,7 +178,7 @@ public class CustomTooltip extends Control {
                 y = nodeY + nodeHeight + 5;
                 break;
             case LEFT:
-                x = nodeX - 5;
+                x = nodeX  - nodeWidth - 5;
                 y = nodeY + nodeHeight / 2;
                 break;
             case RIGHT:
@@ -205,7 +210,7 @@ public class CustomTooltip extends Control {
     // Skin klasa
     private static class CustomTooltipSkin extends SkinBase<CustomTooltip> {
         private final StackPane container;
-        private final HtmlText textNode;
+        private final HtmlText textNode; // Text textNode;
 
         protected CustomTooltipSkin(CustomTooltip control) {
             super(control);
@@ -215,6 +220,9 @@ public class CustomTooltip extends Control {
 
             container = new StackPane(textNode);
             container.getStyleClass().add("tooltip-container");
+            if (control.isHtml) {
+                container.getStyleClass().add("html");
+            }
 
             updateStyleClasses();
 
@@ -236,10 +244,6 @@ public class CustomTooltip extends Control {
 
             container.getStyleClass().add(getSkinnable().type.name().toLowerCase());
             container.getStyleClass().add(getSkinnable().size.name().toLowerCase());
-            if(!style.isEmpty()){
-                textNode.setFont(font);
-                textNode.getStyleClass().add(style);
-            }
 
             if (getSkinnable().showArrow) {
                 container.getStyleClass().add("with-arrow");
@@ -277,55 +281,40 @@ public class CustomTooltip extends Control {
             super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
 
             double containerWidth = container.prefWidth(-1) + 6;
-            double containerHeight = container.prefHeight(-1) + 6;
+            double containerHeight = container.prefHeight(-1);
 
-            double x = container.getLayoutX();
-            double y = container.getLayoutY();
+            // Console.log("Container size: " + containerWidth + "x" + containerHeight);
 
-//            Console.log("Container size: " + containerWidth + "x" + containerHeight);
-
-            if (getSkinnable().position == TooltipPosition.LEFT) {
- //               Console.log("container width: " + containerWidth);
-                // Centriraj container u tooltip-u
-                container.resizeRelocate(
-                        (contentWidth - containerWidth) / 2 ,
-                        (contentHeight - containerHeight) / 2,
-                        containerWidth,
-                        containerHeight
-                );
-//                container.setLayoutX( - containerWidth);
-            }else {
-                // Centriraj container u tooltip-u
-                container.resizeRelocate(
-                        (contentWidth - containerWidth) / 2,
-                        (contentHeight - containerHeight) / 2,
-                        containerWidth,
-                        containerHeight
-                );
-            }
+            // Centriraj container u tooltip-u
+            container.resizeRelocate(
+                    (contentWidth - containerWidth) / 2,
+                    (contentHeight - containerHeight) / 2,
+                    containerWidth,
+                    containerHeight
+            );
         }
 
-//        @Override
+        //        @Override
         protected double computeMinWidth(double height) {
             return Math.max(50, container.minWidth(height));
         }
 
-//        @Override
+        //        @Override
         protected double computeMinHeight(double width) {
             return Math.max(20, container.minHeight(width));
         }
 
-//        @Override
+        //        @Override
         protected double computePrefWidth(double height) {
             return container.prefWidth(height) + 20;
         }
 
-//        @Override
+        //        @Override
         protected double computePrefHeight(double width) {
             return container.prefHeight(width) + 10;
         }
 
-//        @Override
+        //        @Override
         protected double computeMaxWidth(double height) {
             return 300;
         }

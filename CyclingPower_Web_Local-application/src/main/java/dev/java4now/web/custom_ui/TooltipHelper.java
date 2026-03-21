@@ -153,9 +153,13 @@ public class TooltipHelper {
         }
     }
 
+    public static void showQuickTooltip(Node node, String text, CustomTooltip.TooltipPosition position){
+        showQuickTooltip(node, text, position,false);
+    }
+
     // Simple method for quick tooltips
-    public static void showQuickTooltip(Node node, String text, CustomTooltip.TooltipPosition position) {
-        CustomTooltip tooltip = new CustomTooltip(text);
+    public static void showQuickTooltip(Node node, String text, CustomTooltip.TooltipPosition position,boolean isHtml) {
+        CustomTooltip tooltip = new CustomTooltip(text,isHtml);
 
         // Add to scene if possible
         Scene scene = node.getScene();

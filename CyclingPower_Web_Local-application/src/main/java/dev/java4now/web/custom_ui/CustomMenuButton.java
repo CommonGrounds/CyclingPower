@@ -5,6 +5,7 @@ import dev.java4now.web.icons.Bootstrap_Icons;
 import dev.java4now.web.icons.CarbonIcons;
 import dev.webfx.platform.console.Console;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -169,7 +170,11 @@ public class CustomMenuButton extends VBox {
             double adjustedX = menuButton.localToScene(0, 0).getX() + menuButton.getScene().getWindow().getX();
             double adjustedY = menuButton.localToScene(0, menuButton.getHeight()).getY() + menuButton.getScene().getWindow().getY();
             Console.log("Showing menu at scene coords: x=" + adjustedX + ", y=" + adjustedY);
-            contextMenu.show(menuButton, adjustedX, adjustedY);
+            if(CyclingPower_Web_Local.screen_height > 700){
+                contextMenu.show(menuButton, adjustedX, adjustedY);
+            }else{
+                contextMenu.show(menuButton, Side.TOP, menuButton.getLayoutX(), menuButton.getLayoutY());
+            }
         } else {
             contextMenu.hide();
         }

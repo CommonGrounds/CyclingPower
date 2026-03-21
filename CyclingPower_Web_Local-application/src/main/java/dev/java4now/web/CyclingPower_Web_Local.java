@@ -24,18 +24,21 @@ import dev.java4now.web.view.LeftPane;
 import dev.java4now.web.view.RightPane;
 import dev.java4now.web.view.UpPane;
 import dev.java4now.web.websocket.WebSocketClient;
+import dev.webfx.extras.webtext.HtmlText;
 import dev.webfx.platform.ast.ReadOnlyAstArray;
 import dev.webfx.platform.ast.ReadOnlyAstObject;
 import dev.webfx.platform.fetch.Fetch;
 import dev.webfx.platform.ast.json.Json;
 import dev.webfx.platform.console.Console;
 import dev.webfx.platform.resource.Resource;
+import dev.webfx.platform.util.Arrays;
 import dev.webfx.platform.windowlocation.WindowLocation;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -56,7 +59,9 @@ import javafx.util.Duration;
 import service.Service_impl;
 
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static dev.java4now.web.Settings.name_txt;
 import static dev.java4now.web.graph.CanvasChartPane.bootstrap_font;
@@ -102,7 +107,8 @@ public class CyclingPower_Web_Local extends Application {
     public static Label path_lbl;
     //--------- Up Pane Controls --------------
     public static Button gnu_btn;
-    //-----------------------------------------
+    //---------- Right Pane Controls ----------
+    public static HtmlText eco_html;
 
     public static final BooleanProperty IS_TOTAL_TIME = new SimpleBooleanProperty(false);
 
@@ -283,19 +289,26 @@ public class CyclingPower_Web_Local extends Application {
         slider_box.setAlignment(Pos.TOP_CENTER);
 
         var right_pane = RightPane.getPane();
+//        var right_pane_scroll = new ScrollPane(right_pane);
         var middle_box = new VBox(stack, graphicon, slider_box);
         StackPane left_pane = LeftPane.get_pane(this);
 
         var content_vbox = new VBox();
         var scroll = new ScrollPane(); // Controls.createVerticalScrollPane(content_vbox);
-        var content_box = new HBox(left_pane, middle_box, right_pane);
+        // Create the VBox with non-null nodes only
+        List<Node> nodes = Arrays.asList(
+                left_pane,
+                middle_box,
+                OperatingSystem.isMobile() ? right_pane : new ScrollPane(right_pane)
+        ).stream().filter(node -> node != null).collect(Collectors.toList());
+        var content_box = new HBox(nodes.toArray(new Node[0]));
         VBox root = new VBox() {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
 //                screen_width = getWidth();
 //                screen_height = getHeight();
-
+//                Console.log("containes tooltip: " + Arrays.toString(right_pane.getChildren().toArray()));
                 // Mobile layout
                 if (screen_width < 800 || screen_height < 600) {
                     if (!pane_managed) {
