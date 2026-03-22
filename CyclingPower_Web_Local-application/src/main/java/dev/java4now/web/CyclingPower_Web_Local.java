@@ -289,7 +289,7 @@ public class CyclingPower_Web_Local extends Application {
         slider_box.setAlignment(Pos.TOP_CENTER);
 
         var right_pane = RightPane.getPane();
-//        var right_pane_scroll = new ScrollPane(right_pane);
+        var right_pane_scroll = new ScrollPane(right_pane);
         var middle_box = new VBox(stack, graphicon, slider_box);
         StackPane left_pane = LeftPane.get_pane(this);
 
@@ -299,7 +299,7 @@ public class CyclingPower_Web_Local extends Application {
         List<Node> nodes = Arrays.asList(
                 left_pane,
                 middle_box,
-                OperatingSystem.isMobile() ? right_pane : new ScrollPane(right_pane)
+                right_pane_scroll
         ).stream().filter(node -> node != null).collect(Collectors.toList());
         var content_box = new HBox(nodes.toArray(new Node[0]));
         VBox root = new VBox() {

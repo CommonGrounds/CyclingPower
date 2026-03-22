@@ -33,9 +33,9 @@ public class SustainabilityCalculator {
         double litersSaved = caloriesToGasolineLiters(myCalories);
         double co2Saved = calculateCo2Saved(litersSaved);
 
-        Console.log("Za utrošenih " + Format.formatDouble_GWT(myCalories,2) + " kcal");
-        Console.log("- Uštedeli ste: " + Format.formatDouble_GWT(litersSaved,3) + " litara benzina");
-        Console.log("- Smanjili ste karbonski otisak za: "  + Format.formatDouble_GWT(co2Saved,3) + " kg CO2");
+//        Console.log("Za utrošenih " + Format.formatDouble_GWT(myCalories,2) + " kcal");
+//        Console.log("- Uštedeli ste: " + Format.formatDouble_GWT(litersSaved,3) + " litara benzina");
+//        Console.log("- Smanjili ste karbonski otisak za: "  + Format.formatDouble_GWT(co2Saved,3) + " kg CO2");
 
         // <span style='white-space: nowrap;'> // important kada treba u jednom redu
         return
@@ -74,6 +74,18 @@ public class SustainabilityCalculator {
                         "    .stat-row  { font-size: 0.6em !important; }  " +
                         "    .badge { padding: 4px 8px !important; font-size: 0.6em !important; } " +
                         " p.note { font-size: 0.5em !important; }  " +
+                        "  } " +
+                        "  @media (max-width: 500px) { " +
+                        "    div.card { " +                     // koristimo klasu umesto inline stilova gde god možemo
+                        "      padding: 0px !important; " +
+                        "    } " +
+                        "    h2 { font-size: 1.2em !important; margin-bottom: 10px !important; } " +
+                        "    .stat-row { font-size: 0.8em !important; } " +
+                        "    .badge { " +
+                        "      padding: 5px 11px !important; " +
+                        "      font-size: 0.75em !important; " +
+                        "    } " +
+                        "    p.note { font-size: 0.65em !important; } " +
                         "  } " +
                         "</style>" +
 

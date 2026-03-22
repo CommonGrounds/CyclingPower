@@ -268,7 +268,7 @@ public class RightPane {
                 lbl_cad2,
                 lbl_cal,
                 lbl_cal2,
-                OperatingSystem.isMobile() ? null : eco_html,
+                eco_html,
                 PIE_CHART_IS_HERE ? name_lbl : null,
                 PIE_CHART_IS_HERE ? name_group : null,
                 PIE_CHART_IS_HERE ? bar_chart : null,

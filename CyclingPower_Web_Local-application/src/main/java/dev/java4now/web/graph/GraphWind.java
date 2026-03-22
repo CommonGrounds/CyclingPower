@@ -398,12 +398,16 @@ public class GraphWind {
     static int[] angles = {0, 45, 90, 135, 180, 225, 270, 315};
 
     public static int heading_direction_angle(String direction) {
+        if (direction.isEmpty()){
+            return 0;
+        }
         for (int i = 0; i < dirs.length; i++) {
             if (dirs[i].equals(direction)) {
                 return angles[i];
             }
         }
         // Ako smjer nije pronađen, možeš baciti izuzetak ili vratiti -1
-        throw new IllegalArgumentException("Nepoznat smjer: " + direction);
+//        throw new IllegalArgumentException("Nepoznat smjer: " + direction);
+        return 0;
     }
 }
