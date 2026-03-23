@@ -25,7 +25,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.*;
 import javafx.scene.transform.Rotate;
 
-import static dev.java4now.web.CyclingPower_Web_Local.activity;
+import static dev.java4now.web.CyclingPower_Web_Local.*;
 import static dev.java4now.web.graph.CanvasChartPane.*;
 
 public class GraphWind {
@@ -72,7 +72,7 @@ public class GraphWind {
         setup_compass_direction_name();
 
 
-        if(CyclingPower_Web_Local.screen_width < 810 || CyclingPower_Web_Local.screen_height < 610){
+        if(screen_width < 810 || screen_height < 610){
             bike_img_final = bike_img_small;
         }else{
             bike_img_final = bike_img;
@@ -91,7 +91,7 @@ public class GraphWind {
 //                    Console.log("width: " + getWidth() + ", height: " + getHeight() + ", width: " + width + ", height: " + height);
                     double width;
                     double height;
-                    if(!OperatingSystem.isMobile()){
+                    if(!OperatingSystem.isMobile() || screen_height < screen_width){
                         width = getWidth();
                         height = getHeight();
                     }else{
