@@ -13,7 +13,6 @@ import dev.java4now.web.http.IPCodes;
 import dev.java4now.web.http.SimpleBase64;
 import dev.java4now.web.icons.Bootstrap_Icons;
 import dev.java4now.web.icons.Feather_Icons;
-import dev.java4now.web.icons.FontAwesomeSolid_Icons;
 import dev.java4now.web.icons.Ionicons;
 import dev.java4now.web.maps.Leaflet;
 import dev.java4now.web.model.CyclingActivity;
@@ -73,7 +72,7 @@ import static dev.java4now.web.websocket.WebSocketClient.startWebSocket;
 
 public class CyclingPower_Web_Local extends Application {
 
-//##############################################################
+    //##############################################################
     public static boolean PRODUCTION = false;
 //##############################################################
 
@@ -87,6 +86,9 @@ public class CyclingPower_Web_Local extends Application {
     public static StackPane uber_root = new StackPane();
     public static VBox pictures_pane = new VBox();
     public static double screen_width, screen_height;
+    public static DoubleProperty screen_ratio_old = new SimpleDoubleProperty(1.0);
+    public static DoubleProperty screen_ratio_new = new SimpleDoubleProperty(1.0);
+    public static final BooleanProperty screen_ratio_changed = new SimpleBooleanProperty(false);
     public static dev.java4now.web.model.CyclingActivity activity;
     NavigableActivityLinkedList.ActivityEntry entry;
     public static Leaflet map;
@@ -138,14 +140,14 @@ public class CyclingPower_Web_Local extends Application {
 
     static Image title_icon_dark = new Image(Resource.toUrl("pics/favicon_dark.ico", CyclingPower_Web_Local.class), false);
     static Image title_icon_light = new Image(Resource.toUrl("pics/favicon_light.ico", CyclingPower_Web_Local.class), false);
-//    public static Image pane_border = new Image(Resource.toUrl("pics/brown-square-texture_10.png", CyclingPower_Web_Local.class), false);
+    //    public static Image pane_border = new Image(Resource.toUrl("pics/brown-square-texture_10.png", CyclingPower_Web_Local.class), false);
     static String tooltip_css = Resource.toUrl("css/tooltip.css", CyclingPower_Web_Local.class);
     boolean pane_managed = false;
 
     @Override
     public void start(Stage primaryStage) {
 
-        if (PRODUCTION){
+        if (PRODUCTION) {
             BASE_URL = "https://cyclingpower-server-1.onrender.com";
             websocket_url = "wss://cyclingpower-server-1.onrender.com/ws";
             IMAGE_UPLOAD_URL = "https://cyclingpower-server-1.onrender.com/api/upload-image";
@@ -162,6 +164,13 @@ public class CyclingPower_Web_Local extends Application {
 //        Console.log("%s".formatted("Hello"));
         Settings.loadState();
         Settings.getScreenSize();
+        if ((screen_width / screen_height) < 1.0) {
+            screen_ratio_old.set(0.5);
+            screen_ratio_new.set(0.5);
+        } else {
+            screen_ratio_old.set(1.5);
+            screen_ratio_new.set(1.5);
+        }
 
         // important kada se dobije message from server da ima novi update ( novi json )
         data_is_ready.addListener((obs, ov, nv) -> {
@@ -191,6 +200,7 @@ public class CyclingPower_Web_Local extends Application {
             ProgressPane.graphicon_width = nv.doubleValue();
         });
         graphicon.heightProperty().addListener((obs, ov, nv) -> {
+//            Console.log("graphicon.heightProperty().addListener(): " + nv.doubleValue());
             ProgressPane.graphicon_height = nv.doubleValue();
         });
 
@@ -204,7 +214,7 @@ public class CyclingPower_Web_Local extends Application {
         name_btn.setFont(font);
         name_btn.getStyleClass().addAll("font-icon-button_fe", "name_btn");
         // "<font color=\"red\">Change</font> \uD83D\uDEB4\uD83C\uDFFC name"
-        name_btn.setOnMouseEntered( e -> TooltipHelper.showQuickTooltip(name_btn,"Change name", CustomTooltip.TooltipPosition.RIGHT));
+        name_btn.setOnMouseEntered(e -> TooltipHelper.showQuickTooltip(name_btn, "Change name", CustomTooltip.TooltipPosition.RIGHT));
         name_btn.setOnMouseClicked(e -> {
             // Custom dialog setup
             CustomDialog dialog = new CustomDialog("Change name", input -> {
@@ -213,7 +223,7 @@ public class CyclingPower_Web_Local extends Application {
             });
             dialog.show(uber_root);
         });
-        name_group = new HBox(10,name_btn,name_lbl_2);
+        name_group = new HBox(10, name_btn, name_lbl_2);
         name_group.setAlignment(Pos.CENTER);
         server_lbl = new Label();
         server_lbl.textProperty().bind(server_txt);
@@ -290,7 +300,16 @@ public class CyclingPower_Web_Local extends Application {
 
         var right_pane = RightPane.getPane();
         var right_pane_scroll = new ScrollPane(right_pane);
-        var middle_box = new VBox(stack, graphicon, slider_box);
+        var middle_box = new VBox(stack, graphicon, slider_box) {
+            @Override
+            protected void layoutChildren() {
+                super.layoutChildren();
+                if (OperatingSystem.isMobile() && graphicon.getHeight() < CyclingPower_Web_Local.screen_height / 2) {
+                    graphicon.setMinHeight(CyclingPower_Web_Local.screen_height / 2);
+                    graphicon.setPadding(new Insets(20, 0, 0, 0));
+                }
+            }
+        };
         StackPane left_pane = LeftPane.get_pane(this);
 
         var content_vbox = new VBox();
@@ -306,11 +325,9 @@ public class CyclingPower_Web_Local extends Application {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
-//                screen_width = getWidth();
-//                screen_height = getHeight();
-//                Console.log("containes tooltip: " + Arrays.toString(right_pane.getChildren().toArray()));
                 // Mobile layout
-                if (screen_width < 800 || screen_height < 600) {
+                if (OperatingSystem.isMobile()) {
+                    check_rotation();
                     if (!pane_managed) {
                         pane_managed = true;
                         getChildren().removeAll(content_box);
@@ -331,16 +348,17 @@ public class CyclingPower_Web_Local extends Application {
                             pie_chart = null;
                             pie_chart = MovingChart.get_chart();
                             right_pane.getChildren().add(2, pie_chart);
-    //                        Console.log("pie_chart index: " + right_pane.getChildren().indexOf(pie_chart) + ", size: " + right_pane.getChildren().size());
+                            //                        Console.log("pie_chart index: " + right_pane.getChildren().indexOf(pie_chart) + ", size: " + right_pane.getChildren().size());
                             pie_chart.setPrefWidth(getWidth() / 2);
-                            pie_chart.setPrefHeight(getHeight() / 3);
+                            pie_chart.setPrefHeight(screen_height < screen_width ? getHeight() / 2 : getHeight() / 3);
                             pie_chart.setMinWidth(getWidth() / 2);
-                            pie_chart.setMinHeight(getHeight() / 3);
+                            pie_chart.setMinHeight(screen_height < screen_width ? getHeight() / 2 : getHeight() / 3);
                             pie_chart.setMaxWidth(getWidth() / 2);
-                            pie_chart.setMaxHeight(getHeight() / 3);
+                            pie_chart.setMaxHeight(screen_height < screen_width ? getHeight() / 2 : getHeight() / 3);
                             pie_chart.setAlignment(Pos.CENTER);
                             //                           pie_chart.setPadding(new Insets(10, 0, 10, 40)); // left korekcija jer chart nije simetrican zbog axes - ako je 1. el.
-                            pie_chart.setPadding(new Insets(0, 0, 0, screen_width < 500 ? 30 : 40)); // left korekcija ako nije 1. el.
+                            pie_chart.setPadding(new Insets(screen_height < screen_width ? 10 : 0, 0, screen_height < screen_width ? 20 : 0,
+                                    screen_width < 500 ? 30 : 40)); // left korekcija ako nije 1. el.
 //                            Console.log("chart size: " + pie_chart.getWidth() + "," + pie_chart.getHeight() + ", x: " + pie_chart.getLayoutX() + ", y: " + pie_chart.getLayoutY());
 //                            pie_chart.setLayoutX(right_pane.getWidth()/2 - pie_chart.getWidth()/2);
                             int index = right_pane.getChildren().indexOf(server_lbl);
@@ -363,18 +381,19 @@ public class CyclingPower_Web_Local extends Application {
                             bar_chart = SummaryChart.get_chart();
                             right_pane.getChildren().add(index, bar_chart);
                             bar_chart.setPrefWidth(getWidth());
-                            bar_chart.setPrefHeight(getHeight() / 3);
-                            bar_chart.setMinHeight(getHeight() / 3);
+                            bar_chart.setPrefHeight(screen_height < screen_width ? getHeight() / 2 : getHeight() / 3);
+                            bar_chart.setMinHeight(screen_height < screen_width ? getHeight() / 2 : getHeight() / 3);
                             if (screen_width < 600) {
                                 bar_chart.setMinWidth(getWidth());
                                 bar_chart.setMaxWidth(getWidth());
-                            }else{
-                                bar_chart.setMinWidth(getWidth()/2);
-                                bar_chart.setMaxWidth(getWidth()/2);
+                            } else {
+                                bar_chart.setMinWidth(getWidth() / 2);
+                                bar_chart.setMaxWidth(getWidth() / 2);
                             }
-                            bar_chart.setMaxHeight(getHeight() / 3);
+                            bar_chart.setMaxHeight(screen_height < screen_width ? getHeight() / 2 : getHeight() / 3);
                             bar_chart.setAlignment(Pos.CENTER);
-                            bar_chart.setPadding(new Insets(0, 0, 0, screen_width < 500 ? 30 : 40)); // left korekcija ako nije 1. el.
+                            bar_chart.setPadding(new Insets(screen_height < screen_width ? 10 : 0, 0, screen_height < screen_width ? 10 : 0,
+                                    screen_width < 500 ? 30 : 40)); // left korekcija ako nije 1. el.
 //                            }
                             if (right_pane.getChildren().contains(gnu_btn)) {
                                 index = right_pane.getChildren().indexOf(gnu_btn);
@@ -390,7 +409,7 @@ public class CyclingPower_Web_Local extends Application {
                         graphicon.setPrefHeight(getHeight());
                     }
                     //                   chart.setPrefHeight((middle_box.getHeight() - slider_box.getHeight()) / 2); // TODO
-                    Console.log("middle_box-height:width - " + middle_box.getHeight() + ":" + middle_box.getWidth());
+//                    Console.log("middle_box-height:width - " + middle_box.getHeight() + ":" + middle_box.getWidth());
                     middle_box.setMinHeight(getHeight());
                     middle_box.setPrefWidth(getWidth());
                 }
@@ -459,14 +478,14 @@ public class CyclingPower_Web_Local extends Application {
                     dialog.show(uber_root);
                 }
 //                Console.log("user:pass - " + name_txt.get() + ":" + Settings.pass_txt);
-                if(Service_impl.isDarkModeEnabled()){
+                if (Service_impl.isDarkModeEnabled()) {
 //                    if (UserAgent.isFireFox()){
 //                        primaryStage.getIcons().add(0, title_icon_dark);
 //                    }else{
-                        primaryStage.getIcons().add(0, title_icon_light);
- //                   }
+                    primaryStage.getIcons().add(0, title_icon_light);
+                    //                   }
 //                    Console.log("Dark mode enabled");
-                }else{
+                } else {
                     primaryStage.getIcons().add(0, title_icon_dark);
 //                    Console.log("Light mode enabled");
                 }
@@ -493,14 +512,41 @@ public class CyclingPower_Web_Local extends Application {
                 );
 
 
+                screen_ratio_changed.addListener((observableValue, oldValue, newValue) -> {
+                    if (OperatingSystem.isMobile()) {
+                        if (newValue) {
+                            screen_ratio_changed.set(false);
+                            Console.log("Screen Rotating");
+                            WindowLocation.assignHref(WindowLocation.getHref()); // important - reload
+                        }
+                    }
+                });
+
                 // Koristi TooltipHelper - important nowrap white-space: nowrap;
                 TooltipHelper.attachTooltip(gnu_btn, "⚡ May the <br><span style='white-space: nowrap;'><b>Source</b> be with <b>You</b></span>",   // Go to \nSpaghetti Monster
                         CustomTooltip.TooltipPosition.LEFT,
                         CustomTooltip.TooltipType.DEFAULT,
-                         true);
+                        true);
 //                TooltipHelper.detachTooltip(pastafarian);
             }
         });
+    }
+
+
+    //--------------------------------------------
+    private void check_rotation() {
+        Console.log("check_rotation()");
+        if ((screen_width / screen_height) < 1.0) {
+            screen_ratio_new.set(0.5);
+        } else {
+            screen_ratio_new.set(1.5);
+        }
+        if (screen_ratio_old.get() != screen_ratio_new.get()) {
+            screen_ratio_old.set(screen_ratio_new.get());
+            if (OperatingSystem.isMobile()) {
+                screen_ratio_changed.set(true);
+            }
+        }
     }
 
 
@@ -512,7 +558,7 @@ public class CyclingPower_Web_Local extends Application {
             map.delete_plot();
         }
 
-        if(url.get() == null || url.get().isEmpty()){
+        if (url.get() == null || url.get().isEmpty()) {
             return;
         }
 
@@ -575,7 +621,7 @@ public class CyclingPower_Web_Local extends Application {
                                         graphic_icon.get().setText(Ionicons.getIcon("ION_NAVIGATE"));
                                     } else {
                                         device.set(activity.getDeviceInfo().getProductName());
-                                        graphic_icon.get().setText( Ionicons.getIcon("ION_IPHONE"));
+                                        graphic_icon.get().setText(Ionicons.getIcon("ION_IPHONE"));
 //                                      graphic_icon.set( new Text(Ionicons.getIcon("SMARTPHONE")));  // uvek novi text
 //                                      graphic_icon.get().getStyleClass().clear();
 //                                      graphic_icon.get().getStyleClass().add("num_label_right_feather"); // important mora ako uvek dodajem new Text()
@@ -671,7 +717,7 @@ public class CyclingPower_Web_Local extends Application {
             graphic_icon.get().setText(Ionicons.getIcon("ION_NAVIGATE"));
         } else {
             device.set(activity.getDeviceInfo().getProductName());
-            graphic_icon.get().setText( Ionicons.getIcon("ION_IPHONE"));    // Ostaje isti Text Node
+            graphic_icon.get().setText(Ionicons.getIcon("ION_IPHONE"));    // Ostaje isti Text Node
 //          graphic_icon.set( new Text(Ionicons.getIcon("SMARTPHONE")));              // uvek novi text
 //          graphic_icon.get().getStyleClass().clear();
 //          graphic_icon.get().getStyleClass().add("num_label_right_feather");             // important mora ako uvek dodajem new Text()

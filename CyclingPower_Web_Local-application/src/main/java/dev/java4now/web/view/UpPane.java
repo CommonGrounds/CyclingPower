@@ -27,6 +27,7 @@ import dev.webfx.platform.fetch.Fetch;
 import dev.webfx.platform.fetch.FetchOptions;
 import dev.webfx.platform.fetch.Headers;
 import dev.webfx.platform.file.File;
+import dev.webfx.platform.os.OperatingSystem;
 import dev.webfx.platform.util.Arrays;
 import javafx.animation.*;
 import javafx.application.Platform;
@@ -236,7 +237,11 @@ public class UpPane {
 //                setTranslateY(-(screen_height / 2));
                 // Set max and preferred height to half screen height
 //                setMaxHeight(screen_height / 2);
-                setPrefHeight(screen_height / 2);
+                if(OperatingSystem.isMobile() && screen_height < screen_width){
+                    setPrefHeight(screen_height);
+                }else {
+                    setPrefHeight(screen_height / 2);
+                }
                 setPrefWidth(screen_width);
 //                Console.log("Pane Height: " + getHeight() + " Pane Width: " + getWidth());
                 super.layoutChildren();
@@ -347,12 +352,17 @@ public class UpPane {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
-                if(screen_width < 800 ){
+                if(OperatingSystem.isMobile() && screen_height < screen_width){
                     close_btn.setLayoutX(getWidth()/2 - close_btn.getLayoutBounds().getWidth()/2);
+                    close_btn.setLayoutY(10);
                 }else {
-                    close_btn.setLayoutX(10);
+                    if(screen_width < 800 ){
+                        close_btn.setLayoutX(getWidth()/2 - close_btn.getLayoutBounds().getWidth()/2);
+                    }else {
+                        close_btn.setLayoutX(10);
+                    }
+                    close_btn.setLayoutY(10);
                 }
-                close_btn.setLayoutY(10);
             }
         };
         transparentPane.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0, 0), null, null)));
@@ -363,9 +373,15 @@ public class UpPane {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
-                transparentPane.setLayoutY(getHeight()/2 + 8);
-                transparentPane.setPrefWidth(getWidth());
-                transparentPane.setPrefHeight(getHeight()/2 - 8);
+                if(OperatingSystem.isMobile() && screen_height < screen_width){
+//                    transparentPane.setLayoutY(getHeight()/2 + 8);
+                    transparentPane.setPrefWidth(getWidth());
+                    transparentPane.setPrefHeight(0);
+                } else {
+                    transparentPane.setLayoutY(getHeight()/2 + 8);
+                    transparentPane.setPrefWidth(getWidth());
+                    transparentPane.setPrefHeight(getHeight()/2 - 8);
+                }
             }
         };
         return rootPane;

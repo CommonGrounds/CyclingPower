@@ -75,7 +75,7 @@ public class SustainabilityCalculator {
                         "    .badge { padding: 4px 8px !important; font-size: 0.6em !important; } " +
                         " p.note { font-size: 0.5em !important; }  " +
                         "  } " +
-                        "  @media (max-width: 500px) { " +
+                        "  @media (max-width: 799px) { " +
                         "    div.card { " +                     // koristimo klasu umesto inline stilova gde god možemo
                         "      padding: 0px !important; " +
                         "    } " +

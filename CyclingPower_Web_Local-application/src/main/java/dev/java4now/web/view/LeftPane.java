@@ -86,7 +86,7 @@ public class LeftPane {
             UpPane.rotate_translate(UpPane.Direction.DOWN);
         });
 
-        if ((screen_width >= 800 || screen_height >= 600) && pie_chart == null){
+        if (!OperatingSystem.isMobile() && pie_chart == null){
 //            Console.log("pie_chart created in left pane - screen_width: " + screen_width);
             pie_chart = MovingChart.get_chart();
             bar_chart = SummaryChart.get_chart();

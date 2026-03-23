@@ -179,7 +179,7 @@ public class RightPane {
 
         boolean PIE_CHART_IS_HERE;
         boolean PASTAFARIAN_IS_HERE;
-        if ((screen_width < 800 || screen_height < 600) && pie_chart == null){
+        if ( OperatingSystem.isMobile() && pie_chart == null){
 //            Console.log("pie_chart created in right pane");
             pie_chart = MovingChart.get_chart();
             bar_chart = SummaryChart.get_chart();
