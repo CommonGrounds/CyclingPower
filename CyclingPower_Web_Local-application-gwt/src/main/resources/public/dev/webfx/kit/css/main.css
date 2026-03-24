@@ -1342,8 +1342,8 @@ input[type=password]{
 */
 
 
-/* Adjust font size for screens < 500px */
-@media screen and (max-width: 700px) {
+/* Adjust font size for screens < 799px */
+@media screen and (max-width: 799px) {
 
     fx-textfield {
         height: 30px !important;
