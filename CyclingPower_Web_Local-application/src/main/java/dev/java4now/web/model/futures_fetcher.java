@@ -5,6 +5,7 @@ import dev.java4now.web.Settings;
 import dev.java4now.web.charts.SummaryChart;
 import dev.java4now.web.custom_ui.MenuButtonGroup;
 import dev.java4now.web.http.SimpleBase64;
+import dev.java4now.web.view.UpPane;
 import dev.webfx.platform.ast.ReadOnlyAstArray;
 import dev.webfx.platform.ast.ReadOnlyAstObject;
 import dev.webfx.platform.ast.json.Json;
@@ -94,6 +95,7 @@ public class futures_fetcher {
                                                         list.add(activity);
                                                         if(LOAD_ACTIVITY && Settings.AUTO_LOAD){
                                                             CyclingPower_Web_Local.load_activity(activity); // auto ucitavanje samo 1. rezultata
+                                                            UpPane.fetchImageForJson(fileName);
                                                             LOAD_ACTIVITY = false;
                                                         }
                                                         activityCache.put(fileName, activity);

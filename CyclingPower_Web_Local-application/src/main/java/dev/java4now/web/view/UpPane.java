@@ -408,7 +408,7 @@ public class UpPane {
 
 
     // Updated fetchImageForJson for WebFX Response API
-    private static void fetchImageForJson(String jsonFile) {
+    public static void fetchImageForJson(String jsonFile) {
 
         AtomicInteger counter = new AtomicInteger();
 
